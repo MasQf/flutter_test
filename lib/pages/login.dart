@@ -4,8 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:test/api/user.dart';
 import 'package:test/constants/color.dart';
+import 'package:test/controllers/user.dart';
 import 'package:test/models/user.dart';
+import 'package:test/pages/home.dart';
 import 'package:test/pages/register.dart';
+import 'package:test/pages/reset_password.dart';
 import 'package:test/widgets/head_bar.dart';
 
 class LoginPage extends StatefulWidget {
@@ -22,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: kBackColor,
       body: Column(
         children: [
           HeadBar(title: '登录'),
@@ -100,10 +103,19 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     onPressed: () async {
                       try {
-                        UserModel user = await UserApi.login(
+                        var res = await UserApi.login(
                             email: emailController.text,
                             password: passwordController.text);
-                        print(user);
+                        if (res['status']) {
+                          print(res['user']);
+                          UserController userController =
+                              Get.put(UserController());
+                          userController.name.value = res['user']['name'];
+                          userController.email.value = res['user']['email'];
+
+                          Get.to(() => HomePage(),
+                              transition: Transition.cupertino);
+                        }
                       } catch (e) {
                         print(e);
                       }
@@ -133,6 +145,19 @@ class _LoginPageState extends State<LoginPage> {
                       Get.to(() => RegisterPage(),
                           transition: Transition.cupertino);
                     }),
+                CupertinoButton(
+                    child: Text(
+                      '忘记密码?',
+                      style: TextStyle(
+                        fontSize: 37.sp,
+                        fontWeight: FontWeight.bold,
+                        color: kMainColor,
+                      ),
+                    ),
+                    onPressed: () {
+                      Get.to(() => ResetPasswordPage(),
+                          transition: Transition.cupertino);
+                    })
               ],
             ),
           )
