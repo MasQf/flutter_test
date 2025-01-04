@@ -3,6 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:test/pages/login.dart';
+import 'package:test/pages/splash.dart';
+
+class MyScrollBehavior extends ScrollBehavior {
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return BouncingScrollPhysics(); // 去掉弹性
+  }
+}
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // 确保 Flutter 绑定初始化
@@ -25,8 +33,9 @@ class MyApp extends StatelessWidget {
     return ScreenUtilInit(
       designSize: Size(1080, 1920),
       builder: (context, child) => GetMaterialApp(
+        scrollBehavior: MyScrollBehavior(),
         debugShowCheckedModeBanner: false,
-        home: LoginPage(),
+        home: SplashPage(),
       ),
     );
   }

@@ -36,6 +36,17 @@ class UserApi {
     }
   }
 
+  static Future<dynamic> verifyToken() async {
+    try {
+      final response = await Api().post('/verify_token', data: {});
+      var res = response.data;
+
+      return res;
+    } catch (e) {
+      throw Exception("Error login: $e");
+    }
+  }
+
   // 发送邮箱验证码
   static Future<dynamic> sendCode({required String email}) async {
     try {

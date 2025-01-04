@@ -24,7 +24,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool isCodeLoading = false;
   bool isLoading = false;
-  bool isEmail = false;
   bool canRegister = false;
 
   // 检查输入框内容不为空
@@ -41,7 +40,7 @@ class _RegisterPageState extends State<RegisterPage> {
         password.isNotEmpty;
 
     setState(() {
-      canRegister = allFieldsNotEmpty && isEmail; // 还可以加上邮箱格式校验
+      canRegister = allFieldsNotEmpty;
     });
   }
 
@@ -54,18 +53,6 @@ class _RegisterPageState extends State<RegisterPage> {
     emailController.addListener(_checkFormState);
     codeController.addListener(_checkFormState);
     passwordController.addListener(_checkFormState);
-
-    // 监听邮箱输入内容
-    emailController.addListener(() {
-      final email = emailController.text;
-      // 校验邮箱格式
-      const emailRegex = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
-      final isValid = RegExp(emailRegex).hasMatch(email);
-      // 更新状态
-      setState(() {
-        isEmail = isValid;
-      });
-    });
   }
 
   @override
@@ -168,7 +155,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   controller: emailController,
                                   decoration: InputDecoration(
                                       border: InputBorder.none,
-                                      hintText: '请确保邮箱正确',
+                                      hintText: '邮箱',
                                       hintStyle: TextStyle(
                                           fontSize: 40.sp,
                                           color: const Color.fromARGB(
@@ -184,128 +171,106 @@ class _RegisterPageState extends State<RegisterPage> {
                         ],
                       ),
                       SizedBox(height: 20.w),
-                      if (isEmail)
-                        Row(
-                          children: [
-                            Container(
-                              width: 150.w,
-                              child: Text(
-                                '验证码',
-                                style: TextStyle(
-                                    fontSize: 40.sp,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                      Row(
+                        children: [
+                          Container(
+                            width: 150.w,
+                            child: Text(
+                              '验证码',
+                              style: TextStyle(
+                                  fontSize: 40.sp, fontWeight: FontWeight.bold),
                             ),
-                            Expanded(
-                              child: Container(
-                                height: 120.h,
-                                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10.r),
-                                    border: Border.all(
-                                      color: const Color.fromARGB(
-                                          255, 214, 214, 214),
-                                      width: 2.w,
-                                    )),
-                                child: Center(
-                                  child: TextField(
-                                    controller: codeController,
-                                    decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        hintText: '验证码',
-                                        hintStyle: TextStyle(
-                                            fontSize: 40.sp,
-                                            color: const Color.fromARGB(
-                                                255, 198, 198, 198))),
-                                    style: TextStyle(
-                                      fontSize: 40.sp,
-                                      color: Colors.black,
-                                    ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              height: 120.h,
+                              padding: EdgeInsets.symmetric(horizontal: 20.w),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10.r),
+                                  border: Border.all(
+                                    color: const Color.fromARGB(
+                                        255, 214, 214, 214),
+                                    width: 2.w,
+                                  )),
+                              child: Center(
+                                child: TextField(
+                                  controller: codeController,
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: '验证码',
+                                      hintStyle: TextStyle(
+                                          fontSize: 40.sp,
+                                          color: const Color.fromARGB(
+                                              255, 198, 198, 198))),
+                                  style: TextStyle(
+                                    fontSize: 40.sp,
+                                    color: Colors.black,
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(width: 10.w),
-                            CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                child: Stack(children: [
-                                  Container(
-                                    height: 120.h,
-                                    width: 150.w,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 30.w),
-                                    decoration: BoxDecoration(
-                                      color: isCodeLoading
-                                          ? Colors.transparent
-                                          : Colors.white,
-                                      borderRadius: BorderRadius.circular(10.r),
-                                      border: isCodeLoading
-                                          ? Border.all(
-                                              color: Colors.transparent,
-                                              width: 2.w,
-                                            )
-                                          : Border.all(
-                                              color: const Color.fromARGB(
-                                                  255, 214, 214, 214),
-                                              width: 2.w,
-                                            ),
-                                    ),
-                                    child: Center(
-                                      child: isCodeLoading
-                                          ? CupertinoActivityIndicator(
-                                              radius: 30.r)
-                                          : Text(
-                                              '获取',
-                                              style: TextStyle(
-                                                fontSize: 40.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: kMainColor,
-                                              ),
-                                            ),
-                                    ),
+                          ),
+                          SizedBox(width: 10.w),
+                          CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              child: Stack(children: [
+                                Container(
+                                  height: 120.h,
+                                  width: 150.w,
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 30.w),
+                                  decoration: BoxDecoration(
+                                    color: isCodeLoading
+                                        ? Colors.transparent
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(10.r),
+                                    border: isCodeLoading
+                                        ? Border.all(
+                                            color: Colors.transparent,
+                                            width: 2.w,
+                                          )
+                                        : Border.all(
+                                            color: const Color.fromARGB(
+                                                255, 214, 214, 214),
+                                            width: 2.w,
+                                          ),
                                   ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Container(
-                                      height: 120.h,
-                                      width: 40.w,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.centerRight,
-                                          end: Alignment.centerLeft,
-                                          colors: [
-                                            Color.fromARGB(255, 237, 237, 237),
-                                            Color.fromARGB(0, 245, 245, 245),
-                                          ],
-                                        ),
-                                        borderRadius:
-                                            BorderRadius.circular(10.r),
-                                      ),
-                                    ),
+                                  child: Center(
+                                    child: isCodeLoading
+                                        ? CupertinoActivityIndicator(
+                                            radius: 30.r)
+                                        : Text(
+                                            '获取',
+                                            style: TextStyle(
+                                              fontSize: 40.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: kMainColor,
+                                            ),
+                                          ),
                                   ),
-                                ]),
-                                onPressed: () async {
-                                  setState(() {
-                                    isCodeLoading = true;
-                                  });
-                                  // var res = await UserApi.sendCode(
-                                  //     email: emailController.text);
-                                  // // 判断返回结果
-                                  // if (res is VerificationCodeModel) {
-                                  //   // 处理验证码
-                                  //   code = res;
-                                  // } else {
-                                  //   // 处理其他类型的返回数据
-                                  //   print("Error: ${res['msg']}");
-                                  // }
-                                  // setState(() {
-                                  //   isCodeLoading = false;
-                                  // });
-                                }),
-                          ],
-                        ),
+                                ),
+                              ]),
+                              onPressed: () async {
+                                setState(() {
+                                  isCodeLoading = true;
+                                });
+                                // var res = await UserApi.sendCode(
+                                //     email: emailController.text);
+                                // // 判断返回结果
+                                // if (res is VerificationCodeModel) {
+                                //   // 处理验证码
+                                //   code = res;
+                                // } else {
+                                //   // 处理其他类型的返回数据
+                                //   print("Error: ${res['msg']}");
+                                // }
+                                // setState(() {
+                                //   isCodeLoading = false;
+                                // });
+                              }),
+                        ],
+                      ),
                       SizedBox(height: 20.w),
                       Row(
                         children: [

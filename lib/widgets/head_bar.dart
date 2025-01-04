@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:test/constants/color.dart';
+import 'package:test/constants/text.dart';
 
 class HeadBar extends StatefulWidget {
   const HeadBar({super.key, required this.title, this.canBack = false});
@@ -55,10 +56,7 @@ class _HeadBarState extends State<HeadBar> {
         Spacer(),
         Text(
           widget.title,
-          style: TextStyle(
-            fontSize: 50.sp,
-            fontWeight: FontWeight.bold,
-          ),
+          style: kPageTitle,
         ),
         Spacer(),
         if (widget.canBack)

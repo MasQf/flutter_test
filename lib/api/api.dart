@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test/models/error_message.dart';
 
 String APPLICATION_JSON = "application/json";
@@ -49,7 +50,7 @@ class Api {
     // 拦截器 - 日志打印
     if (!kReleaseMode) {
       _dio.interceptors.add(PrettyDioLogger(
-        requestHeader: false, // 请求头
+        requestHeader: true, // 请求头
         requestBody: true, // 请求体
         responseHeader: false, // 响应头
         responseBody: true, // 响应体
@@ -61,11 +62,11 @@ class Api {
   }
 
   void setToken(String token) {
-    _dio.options.headers['token'] = token;
+    _dio.options.headers['Authorization'] = token;
   }
 
   void removeToken() {
-    _dio.options.headers.remove('token');
+    _dio.options.headers.remove('Authorization');
   }
 
   /// get 请求

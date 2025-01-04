@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:test/api/api.dart';
 import 'package:test/api/user.dart';
 import 'package:test/constants/color.dart';
+import 'package:test/controllers/token.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/models/user.dart';
 import 'package:test/pages/home.dart';
@@ -19,6 +21,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  UserController userController = Get.find<UserController>();
+
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -107,9 +111,10 @@ class _LoginPageState extends State<LoginPage> {
                             email: emailController.text,
                             password: passwordController.text);
                         if (res['status']) {
-                          print(res['user']);
-                          UserController userController =
-                              Get.put(UserController());
+                          String token = res['token'];
+                          await saveToken(token);
+                          print('token: ${token}');
+
                           userController.name.value = res['user']['name'];
                           userController.email.value = res['user']['email'];
 
