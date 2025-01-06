@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/constants/text.dart';
-import 'package:test/pages/animation.dart';
-import 'package:test/pages/scroller_view.dart';
+import 'package:test/pages/chat.dart';
+import 'package:test/pages/chat_list.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,17 +23,10 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CupertinoButton(
-                child: Text('ScrollViewPage', style: kPageTitle),
+                child: Text('ChatPage', style: kPageTitle),
                 onPressed: () {
-                  Get.to(() => ScrollViewPage(),
-                      transition: Transition.cupertino);
+                  Get.to(() => ChatPage(), transition: Transition.cupertino);
                 }),
-            CupertinoButton(
-                child: Text('ParabolaAnimationPage', style: kPageTitle),
-                onPressed: () {
-                  Get.to(() => ParabolaAnimationPage(),
-                      transition: Transition.cupertino);
-                })
           ],
         ),
       ),
