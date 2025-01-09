@@ -5,12 +5,13 @@ import 'package:get/get.dart';
 import 'package:test/api/api.dart';
 import 'package:test/api/user.dart';
 import 'package:test/constants/color.dart';
-import 'package:test/controllers/token.dart';
+import 'package:test/utils/token.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/models/user.dart';
 import 'package:test/pages/home.dart';
 import 'package:test/pages/register.dart';
 import 'package:test/pages/reset_password.dart';
+import 'package:test/pages/root.dart';
 import 'package:test/widgets/head_bar.dart';
 
 class LoginPage extends StatefulWidget {
@@ -114,11 +115,12 @@ class _LoginPageState extends State<LoginPage> {
                           String token = res['token'];
                           await saveToken(token);
                           print('token: ${token}');
-
+                          // 存储用户信息
+                          userController.id.value = res['user']['_id'];
                           userController.name.value = res['user']['name'];
                           userController.email.value = res['user']['email'];
 
-                          Get.to(() => HomePage(),
+                          Get.to(() => RootPage(),
                               transition: Transition.cupertino);
                         }
                       } catch (e) {

@@ -1,4 +1,6 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:test/models/chat.dart';
+import 'package:test/models/message.dart';
 
 class SocketService {
   late IO.Socket socket;
@@ -34,15 +36,14 @@ class SocketService {
   }
 
   // 发送消息
-  void sendMessage(
-      String roomId, String senderId, String content, String type) {
+  void sendMessage(MessageModel msg) {
     socket.emit('sendMessage', {
-      'roomId': roomId,
-      'senderId': senderId,
-      'content': content,
-      'type': type,
+      'roomId': msg.roomId,
+      'senderId': msg.senderId,
+      'receiverId': msg.receiverId,
+      'content': msg.content,
+      'type': msg.type,
     });
-    print('Message sent: $content');
   }
 
   // 接收消息

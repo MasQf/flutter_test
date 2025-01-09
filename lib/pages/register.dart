@@ -255,19 +255,19 @@ class _RegisterPageState extends State<RegisterPage> {
                                 setState(() {
                                   isCodeLoading = true;
                                 });
-                                // var res = await UserApi.sendCode(
-                                //     email: emailController.text);
-                                // // 判断返回结果
-                                // if (res is VerificationCodeModel) {
-                                //   // 处理验证码
-                                //   code = res;
-                                // } else {
-                                //   // 处理其他类型的返回数据
-                                //   print("Error: ${res['msg']}");
-                                // }
-                                // setState(() {
-                                //   isCodeLoading = false;
-                                // });
+                                var res = await UserApi.sendCode(
+                                    email: emailController.text);
+                                // 判断返回结果
+                                if (res is VerificationCodeModel) {
+                                  // 处理验证码
+                                  code = res;
+                                } else {
+                                  // 处理其他类型的返回数据
+                                  print("Error: ${res['msg']}");
+                                }
+                                setState(() {
+                                  isCodeLoading = false;
+                                });
                               }),
                         ],
                       ),

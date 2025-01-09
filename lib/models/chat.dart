@@ -1,29 +1,31 @@
-class ChatItem {
+import 'package:test/models/message.dart';
+import 'package:test/models/user.dart';
+
+class ChatModel {
   final String id;
-  final String name;
-  final String lastMessage;
-  final String avatar;
-  final DateTime lastMessageTime;
+  final String roomId;
+  final List<String> participants;
+  final MessageModel lastMessage;
+  final int unreadCount;
+  final UserModel targetUser;
 
-  ChatItem({
+  ChatModel({
     required this.id,
-    required this.name,
+    required this.roomId,
+    required this.participants,
     required this.lastMessage,
-    required this.avatar,
-    required this.lastMessageTime,
+    required this.unreadCount,
+    required this.targetUser,
   });
-}
 
-class Message {
-  final String senderId;
-  final String content;
-  final String type; // text, image, video
-  final DateTime time;
-
-  Message({
-    required this.senderId,
-    required this.content,
-    required this.type,
-    required this.time,
-  });
+  factory ChatModel.fromJson(Map<String, dynamic> json) {
+    return ChatModel(
+      id: json['_id'],
+      roomId: json['roomId'],
+      participants: List<String>.from(json['participants']),
+      lastMessage: MessageModel.fromJson(json['lastMessage']), // 填充 lastMessage
+      unreadCount: json['unreadCount'],
+      targetUser: UserModel.fromJson(json['targetUser']),
+    );
+  }
 }

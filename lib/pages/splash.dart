@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test/api/api.dart';
 import 'package:test/api/user.dart';
-import 'package:test/controllers/token.dart';
+import 'package:test/utils/token.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/pages/home.dart';
 import 'package:test/pages/login.dart';
@@ -41,7 +41,7 @@ class _SplashPageState extends State<SplashPage> {
           // 验证成功,更新 Token
           final newToken = res['token'];
           await saveToken(newToken);
-
+          userController.id.value = res['user']['_id'];
           userController.name.value = res['user']['name'];
           userController.email.value = res['user']['email'];
 

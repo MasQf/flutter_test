@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test/constants/color.dart';
+import 'package:test/pages/chat_list.dart';
 import 'package:test/pages/home.dart';
 import 'package:test/pages/reset_password.dart';
 
@@ -30,7 +31,7 @@ class _RootPageState extends State<RootPage> {
     _pages = [
       HomePage(),
       ResetPasswordPage(),
-      ResetPasswordPage(),
+      ChatListPage(),
       ResetPasswordPage(),
     ];
   }
@@ -96,13 +97,13 @@ class _RootPageState extends State<RootPage> {
                       children: [
                         Icon(
                           _pageIndex == 1
-                              ? CupertinoIcons.square_stack_3d_up_fill
-                              : CupertinoIcons.square_stack_3d_up,
+                              ? CupertinoIcons.star_fill
+                              : CupertinoIcons.star,
                           size: 80.w,
                           color: _pageIndex == 1 ? kMainColor : kGrey,
                         ),
                         Text(
-                          '分类',
+                          '发布',
                           style: TextStyle(
                               fontSize: 30.sp,
                               fontWeight: FontWeight.bold,
@@ -122,14 +123,14 @@ class _RootPageState extends State<RootPage> {
                           padding: EdgeInsets.only(right: 8.w),
                           child: Icon(
                             _pageIndex == 2
-                                ? CupertinoIcons.person_fill
-                                : CupertinoIcons.person,
+                                ? CupertinoIcons.chat_bubble_fill
+                                : CupertinoIcons.chat_bubble,
                             size: 80.w,
                             color: _pageIndex == 2 ? kMainColor : kGrey,
                           ),
                         ),
                         Text(
-                          '我的',
+                          '消息',
                           style: TextStyle(
                               fontSize: 30.sp,
                               fontWeight: FontWeight.bold,
@@ -149,14 +150,14 @@ class _RootPageState extends State<RootPage> {
                           padding: EdgeInsets.only(right: 8.w),
                           child: Icon(
                             _pageIndex == 3
-                                ? CupertinoIcons.star_fill
-                                : CupertinoIcons.star,
+                                ? CupertinoIcons.person_fill
+                                : CupertinoIcons.person,
                             size: 80.w,
                             color: _pageIndex == 3 ? kMainColor : kGrey,
                           ),
                         ),
                         Text(
-                          '发布',
+                          '我的',
                           style: TextStyle(
                               fontSize: 30.sp,
                               fontWeight: FontWeight.bold,
