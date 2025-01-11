@@ -19,6 +19,12 @@ dependencies:
   sticky_headers: ^0.3.0+2
   socket_io_client: ^3.0.2
   intl: ^0.20.1
+  image_picker: ^1.1.2
+  photo_view: ^0.15.0
+  permission_handler: ^10.2.0
+  path_provider: ^2.1.5
+  mime: ^2.0.0
+  http_parser: ^4.0.2
 
 dev_dependencies:
   flutter_test:

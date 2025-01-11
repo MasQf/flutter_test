@@ -2,13 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:test/api/api.dart';
 import 'package:test/api/user.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/utils/token.dart';
 import 'package:test/controllers/user.dart';
-import 'package:test/models/user.dart';
-import 'package:test/pages/home.dart';
 import 'package:test/pages/register.dart';
 import 'package:test/pages/reset_password.dart';
 import 'package:test/pages/root.dart';
@@ -119,6 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                           userController.id.value = res['user']['_id'];
                           userController.name.value = res['user']['name'];
                           userController.email.value = res['user']['email'];
+                          userController.avatar.value = res['user']['avatar'];
 
                           Get.to(() => RootPage(),
                               transition: Transition.cupertino);

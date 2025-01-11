@@ -119,4 +119,17 @@ class UserApi {
       };
     }
   }
+
+  static Future<dynamic> uploadAvator(
+      {required String userId, required String avatar}) async {
+    try {
+      final response = await Api()
+          .post('/upload_avatar', data: {"userId": userId, "avatar": avatar});
+      var data = response.data;
+
+      return data;
+    } catch (e) {
+      throw Exception("Error Upload Avator: $e");
+    }
+  }
 }

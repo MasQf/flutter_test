@@ -17,10 +17,15 @@ class ChatPage extends StatefulWidget {
   final String senderId;
   final String receiverId;
   final String targetName;
-  const ChatPage(
-      {required this.senderId,
-      required this.receiverId,
-      required this.targetName});
+  final String targetAvatar;
+
+  const ChatPage({
+    required this.senderId,
+    required this.receiverId,
+    required this.targetName,
+    this.targetAvatar = '',
+  });
+
   @override
   _ChatPageState createState() => _ChatPageState();
 }
@@ -90,13 +95,12 @@ class _ChatPageState extends State<ChatPage> {
       }
     });
 
-    // 监听焦点变化
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        // 当 TextField 获得焦点时滚动到底部
-        _scrollToBottom(700);
-      }
-    });
+    // // 监听焦点变化
+    // _focusNode.addListener(() {
+    //   if (_focusNode.hasFocus) {
+    //     _scrollToBottom(1000);
+    //   }
+    // });
   }
 
   @override
@@ -197,17 +201,27 @@ class _ChatPageState extends State<ChatPage> {
                                       width: 100.w,
                                       height: 100.w,
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(10.r),
-                                      ),
-                                      child: Center(
-                                        child: Icon(
-                                          CupertinoIcons.person_fill,
-                                          size: 100.w,
-                                          color: kGrey,
-                                        ),
-                                      ),
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10.r),
+                                          image:
+                                              userController.avatar.value != ''
+                                                  ? DecorationImage(
+                                                      image: NetworkImage(
+                                                          userController
+                                                              .avatar.value),
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : null),
+                                      child: userController.avatar.value != ''
+                                          ? null
+                                          : Center(
+                                              child: Icon(
+                                                CupertinoIcons.person_fill,
+                                                size: 100.w,
+                                                color: kGrey,
+                                              ),
+                                            ),
                                     ),
                                   ],
                                 ),
@@ -227,17 +241,24 @@ class _ChatPageState extends State<ChatPage> {
                                       width: 100.w,
                                       height: 100.w,
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(10.r),
-                                      ),
-                                      child: Center(
-                                        child: Icon(
-                                          CupertinoIcons.person_fill,
-                                          size: 100.w,
-                                          color: kGrey,
-                                        ),
-                                      ),
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10.r),
+                                          image: widget.targetAvatar != ''
+                                              ? DecorationImage(
+                                                  image: NetworkImage(
+                                                      widget.targetAvatar),
+                                                  fit: BoxFit.cover)
+                                              : null),
+                                      child: widget.targetAvatar != ''
+                                          ? null
+                                          : Center(
+                                              child: Icon(
+                                                CupertinoIcons.person_fill,
+                                                size: 100.w,
+                                                color: kGrey,
+                                              ),
+                                            ),
                                     ),
                                     SizedBox(width: 30.w),
                                     ChatBubble(
@@ -291,17 +312,21 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                           SizedBox(width: 30.w),
                           Expanded(
-                            child: Container(
-                              child: CupertinoTextField(
-                                controller: _messageController,
-                                focusNode: _focusNode,
-                                placeholder: '信息',
-                                placeholderStyle: TextStyle(
-                                  fontSize: 37.sp,
-                                  color: CupertinoColors.placeholderText,
+                            child: CupertinoButton(
+                              onPressed: () {},
+                              padding: EdgeInsets.zero,
+                              child: Container(
+                                child: CupertinoTextField(
+                                  controller: _messageController,
+                                  focusNode: _focusNode,
+                                  placeholder: '信息',
+                                  placeholderStyle: TextStyle(
+                                    fontSize: 37.sp,
+                                    color: CupertinoColors.placeholderText,
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 30.w, vertical: 20.w),
                                 ),
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 30.w, vertical: 20.w),
                               ),
                             ),
                           ),

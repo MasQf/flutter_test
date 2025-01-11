@@ -44,6 +44,7 @@ class _SplashPageState extends State<SplashPage> {
           userController.id.value = res['user']['_id'];
           userController.name.value = res['user']['name'];
           userController.email.value = res['user']['email'];
+          userController.avatar.value = res['user']['avatar'];
 
           Get.offAll(() => RootPage(),
               transition: Transition.cupertino); // 跳转到首页

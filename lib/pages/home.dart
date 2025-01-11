@@ -24,25 +24,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackColor,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CupertinoButton(
-                child: Text('Chat List', style: kPageTitle),
-                onPressed: () async {
-                  Get.to(() => ChatListPage(),
-                      transition: Transition.cupertino);
-                }),
-            SizedBox(height: 500.w),
-            CupertinoButton(
-                child: Text('Logout', style: kPageTitle),
-                onPressed: () {
-                  Get.offAll(() => LoginPage());
-                }),
-          ],
-        ),
-      ),
+      body: Container(),
     );
   }
 }

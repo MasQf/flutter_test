@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/pages/chat_list.dart';
 import 'package:test/pages/home.dart';
+import 'package:test/pages/personal.dart';
 import 'package:test/pages/reset_password.dart';
 
 class RootPage extends StatefulWidget {
@@ -32,7 +33,7 @@ class _RootPageState extends State<RootPage> {
       HomePage(),
       ResetPasswordPage(),
       ChatListPage(),
-      ResetPasswordPage(),
+      PersonalPage(),
     ];
   }
 
@@ -59,7 +60,7 @@ class _RootPageState extends State<RootPage> {
                   filter: ImageFilter.blur(sigmaX: 15, sigmaY: 50), // 高斯模糊参数
                   child: Container(
                     height: 180.h,
-                    color: Colors.transparent, // 半透明背景
+                    color: Colors.white.withOpacity(0.2),
                   ),
                 ),
               ),
