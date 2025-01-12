@@ -35,6 +35,12 @@ class SocketService {
     print('Joined room: $roomId');
   }
 
+  // 用户进入聊天详情页，通知服务器重置未读消息数
+  void enterChatDetail(String roomId, String userId) {
+    socket.emit('enterChatDetail', {'roomId': roomId, 'userId': userId});
+    print('User $userId entered chat detail for room $roomId');
+  }
+
   // 发送消息
   void sendMessage(MessageModel msg) {
     socket.emit('sendMessage', {

@@ -57,7 +57,7 @@ class _ChatPageState extends State<ChatPage> {
           if (!isLoading) {
             // 延迟执行滚动
             Future.delayed(Duration(milliseconds: 300), () {
-              _scrollToBottom(8000);
+              _scrollToBottom(0);
             });
           }
         });
@@ -84,6 +84,8 @@ class _ChatPageState extends State<ChatPage> {
     _socketService.connect('http://10.0.2.2:3000');
     // 加入房间
     _socketService.joinRoom(_roomId);
+    // 重置未读消息数
+    _socketService.enterChatDetail(_roomId, _senderId);
     // 监听接收消息
     _socketService.onMessageReceived((message) {
       print('_socketService.onMessageReceived: ${message}');
@@ -92,15 +94,18 @@ class _ChatPageState extends State<ChatPage> {
         setState(() {
           _messages.add(msg);
         });
+        Future.delayed(Duration(milliseconds: 300), () {
+          _scrollToBottom(0);
+        });
       }
     });
 
-    // // 监听焦点变化
-    // _focusNode.addListener(() {
-    //   if (_focusNode.hasFocus) {
-    //     _scrollToBottom(1000);
-    //   }
-    // });
+    // 监听焦点变化
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        _scrollToBottom(800);
+      }
+    });
   }
 
   @override
@@ -125,8 +130,10 @@ class _ChatPageState extends State<ChatPage> {
 
     if (content.isNotEmpty && mounted) {
       _socketService.sendMessage(msg);
-      _scrollToBottom(400);
       _messageController.clear();
+      Future.delayed(Duration(milliseconds: 100), () {
+        _scrollToBottom(0);
+      });
     }
   }
 
@@ -149,216 +156,219 @@ class _ChatPageState extends State<ChatPage> {
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     // 根据键盘是否弹出动态调整高度
     final bottomBoxHeight = keyboardHeight > 0 ? 120.w : 200.w;
-    final lastMarginHeight = keyboardHeight > 0 ? 160.w : 230.w;
+    final lastMarginHeight = keyboardHeight > 0 ? 40.w : 40.w;
 
     return Scaffold(
-      body: Stack(
+      body: Column(
         children: [
-          GlassPage(
-            title: widget.targetName,
-            canBack: true,
-            controller: _scrollController,
-            pressBack: () {
-              chatController.loadChatList(userId: _senderId);
-              Get.back();
-            },
-            sliver: isLoading
-                ? SliverToBoxAdapter(
-                    child: Column(
-                    children: [
-                      SizedBox(height: 30.w),
-                      myBubble(),
-                      targetBubble(),
-                      myBubble(),
-                      targetBubble(),
-                    ],
-                  ))
-                : SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      childCount: _messages.length,
-                      (context, index) {
-                        final MessageModel message = _messages[index];
-                        final isMe = message.senderId == _senderId;
+          Expanded(
+            child: GlassPage(
+              title: widget.targetName,
+              canBack: true,
+              controller: _scrollController,
+              pressBack: () {
+                chatController.loadChatList(userId: _senderId);
+                Get.back();
+              },
+              sliver: isLoading
+                  ? SliverToBoxAdapter(
+                      child: Column(
+                      children: [
+                        SizedBox(height: 30.w),
+                        myBubble(),
+                        targetBubble(),
+                        myBubble(),
+                        targetBubble(),
+                      ],
+                    ))
+                  : SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        childCount: _messages.length,
+                        (context, index) {
+                          final MessageModel message = _messages[index];
+                          final isMe = message.senderId == _senderId;
 
-                        return isMe
-                            ? Container(
-                                width: 1.sw,
-                                margin: EdgeInsets.only(
-                                    bottom: index == _messages.length - 1
-                                        ? lastMarginHeight
-                                        : 40.w,
-                                    top: index == 0 ? 30.w : 0),
-                                padding: EdgeInsets.symmetric(horizontal: 30.w),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    ChatBubble(
-                                        isSentByMe: true,
-                                        message: message.content),
-                                    SizedBox(width: 30.w),
-                                    Container(
-                                      width: 100.w,
-                                      height: 100.w,
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10.r),
-                                          image:
-                                              userController.avatar.value != ''
-                                                  ? DecorationImage(
-                                                      image: NetworkImage(
-                                                          userController
-                                                              .avatar.value),
-                                                      fit: BoxFit.cover,
-                                                    )
-                                                  : null),
-                                      child: userController.avatar.value != ''
-                                          ? null
-                                          : Center(
-                                              child: Icon(
-                                                CupertinoIcons.person_fill,
-                                                size: 100.w,
-                                                color: kGrey,
+                          return isMe
+                              ? Container(
+                                  width: 1.sw,
+                                  margin: EdgeInsets.only(
+                                      bottom: index == _messages.length - 1
+                                          ? lastMarginHeight
+                                          : 40.w,
+                                      top: index == 0 ? 30.w : 0),
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 30.w),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      ChatBubble(
+                                          isSentByMe: true,
+                                          message: message.content),
+                                      SizedBox(width: 30.w),
+                                      Container(
+                                        width: 100.w,
+                                        height: 100.w,
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(10.r),
+                                            image:
+                                                userController.avatar.value !=
+                                                        ''
+                                                    ? DecorationImage(
+                                                        image: NetworkImage(
+                                                            userController
+                                                                .avatar.value),
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : null),
+                                        child: userController.avatar.value != ''
+                                            ? null
+                                            : Center(
+                                                child: Icon(
+                                                  CupertinoIcons.person_fill,
+                                                  size: 100.w,
+                                                  color: kGrey,
+                                                ),
                                               ),
-                                            ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Container(
-                                width: 1.sw,
-                                margin: EdgeInsets.only(
-                                    bottom: index == _messages.length - 1
-                                        ? lastMarginHeight
-                                        : 40.w,
-                                    top: index == 0 ? 30.w : 0),
-                                padding: EdgeInsets.symmetric(horizontal: 30.w),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      width: 100.w,
-                                      height: 100.w,
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10.r),
-                                          image: widget.targetAvatar != ''
-                                              ? DecorationImage(
-                                                  image: NetworkImage(
-                                                      widget.targetAvatar),
-                                                  fit: BoxFit.cover)
-                                              : null),
-                                      child: widget.targetAvatar != ''
-                                          ? null
-                                          : Center(
-                                              child: Icon(
-                                                CupertinoIcons.person_fill,
-                                                size: 100.w,
-                                                color: kGrey,
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Container(
+                                  width: 1.sw,
+                                  margin: EdgeInsets.only(
+                                      bottom: index == _messages.length - 1
+                                          ? lastMarginHeight
+                                          : 40.w,
+                                      top: index == 0 ? 30.w : 0),
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 30.w),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        width: 100.w,
+                                        height: 100.w,
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(10.r),
+                                            image: widget.targetAvatar != ''
+                                                ? DecorationImage(
+                                                    image: NetworkImage(
+                                                        widget.targetAvatar),
+                                                    fit: BoxFit.cover)
+                                                : null),
+                                        child: widget.targetAvatar != ''
+                                            ? null
+                                            : Center(
+                                                child: Icon(
+                                                  CupertinoIcons.person_fill,
+                                                  size: 100.w,
+                                                  color: kGrey,
+                                                ),
                                               ),
-                                            ),
-                                    ),
-                                    SizedBox(width: 30.w),
-                                    ChatBubble(
-                                        isSentByMe: false,
-                                        message: message.content),
-                                  ],
-                                ),
-                              );
-                      },
+                                      ),
+                                      SizedBox(width: 30.w),
+                                      ChatBubble(
+                                          isSentByMe: false,
+                                          message: message.content),
+                                    ],
+                                  ),
+                                );
+                        },
+                      ),
+                    ),
+            ),
+          ),
+          Container(
+            width: 1.sw,
+            height: bottomBoxHeight,
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              border: Border(top: BorderSide(color: kDevideColor)),
+            ),
+            child: Stack(children: [
+              Positioned.fill(
+                child: ClipRect(
+                  // ClipRect 限制模糊范围
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                    child: Container(
+                      height: 200.h,
+                      width: 1.sw,
+                      color: Colors.white.withOpacity(0.7), // 半透明背景
                     ),
                   ),
-          ),
-          Positioned(
-              bottom: 0,
-              child: Container(
-                width: 1.sw,
-                height: bottomBoxHeight,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  border: Border(top: BorderSide(color: kDevideColor)),
                 ),
-                child: Stack(children: [
-                  Positioned.fill(
-                    child: ClipRect(
-                      // ClipRect 限制模糊范围
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                        child: Container(
-                          height: 200.h,
-                          width: 1.sw,
-                          color: Colors.white.withOpacity(0.7), // 半透明背景
+              ),
+              Column(
+                children: [
+                  SizedBox(height: 10.w),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 50.w),
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {},
+                        child: Icon(
+                          CupertinoIcons.camera_fill,
+                          color: kGrey,
+                          size: 80.w,
                         ),
                       ),
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      SizedBox(height: 10.w),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(width: 50.w),
-                          CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {},
-                            child: Icon(
-                              CupertinoIcons.camera_fill,
-                              color: kGrey,
-                              size: 80.w,
+                      SizedBox(width: 30.w),
+                      Expanded(
+                        child: CupertinoButton(
+                          onPressed: () {},
+                          padding: EdgeInsets.zero,
+                          child: Container(
+                            child: CupertinoTextField(
+                              controller: _messageController,
+                              focusNode: _focusNode,
+                              placeholder: '信息',
+                              placeholderStyle: TextStyle(
+                                fontSize: 37.sp,
+                                color: CupertinoColors.placeholderText,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 30.w, vertical: 20.w),
                             ),
                           ),
-                          SizedBox(width: 30.w),
-                          Expanded(
-                            child: CupertinoButton(
-                              onPressed: () {},
-                              padding: EdgeInsets.zero,
-                              child: Container(
-                                child: CupertinoTextField(
-                                  controller: _messageController,
-                                  focusNode: _focusNode,
-                                  placeholder: '信息',
-                                  placeholderStyle: TextStyle(
-                                    fontSize: 37.sp,
-                                    color: CupertinoColors.placeholderText,
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 30.w, vertical: 20.w),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 30.w),
-                          CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              _sendMessage();
-                            },
-                            child: Container(
-                              width: 80.w,
-                              height: 80.w,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: CupertinoColors.activeGreen,
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  CupertinoIcons.arrow_up,
-                                  color: Colors.white,
-                                  size: 60.w,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 50.w),
-                        ],
+                        ),
                       ),
+                      SizedBox(width: 30.w),
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          _sendMessage();
+                        },
+                        child: Container(
+                          width: 80.w,
+                          height: 80.w,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: CupertinoColors.activeGreen,
+                          ),
+                          child: Center(
+                            child: Icon(
+                              CupertinoIcons.arrow_up,
+                              color: Colors.white,
+                              size: 60.w,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 50.w),
                     ],
                   ),
-                ]),
-              ))
+                ],
+              ),
+            ]),
+          ),
         ],
       ),
     );

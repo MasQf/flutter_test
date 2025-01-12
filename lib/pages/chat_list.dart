@@ -8,6 +8,7 @@ import 'package:test/controllers/chat.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/models/chat.dart';
 import 'package:test/pages/chat.dart';
+import 'package:test/services/socket.dart';
 import 'package:test/utils/date.dart';
 import 'package:test/widgets/cup_button.dart';
 import 'package:test/widgets/glass_page.dart';
@@ -20,6 +21,7 @@ class ChatListPage extends StatefulWidget {
 class _ChatListPageState extends State<ChatListPage> {
   ChatController chatController = Get.put(ChatController());
   UserController userController = Get.find<UserController>();
+  final SocketService _socketService = SocketService();
 
   @override
   void initState() {
@@ -121,17 +123,46 @@ class _ChatListPageState extends State<ChatListPage> {
                                     ),
                                   ],
                                 ),
-                                Container(
-                                  width: 0.82.sw,
-                                  child: Text(
-                                    chat.lastMessage.content,
-                                    style: TextStyle(
-                                      fontSize: 40.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: kGrey,
-                                      overflow: TextOverflow.ellipsis,
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 0.7.sw,
+                                      child: Text(
+                                        chat.lastMessage.content,
+                                        style: TextStyle(
+                                          fontSize: 40.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: kGrey,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    SizedBox(width: 30.w),
+                                    if (chat.unreadCount[
+                                                userController.id.value] !=
+                                            null &&
+                                        chat.unreadCount[
+                                                userController.id.value] !=
+                                            0)
+                                      Container(
+                                          width: 50.w,
+                                          height: 50.w,
+                                          decoration: BoxDecoration(
+                                            color: kMainColor,
+                                            borderRadius:
+                                                BorderRadius.circular(50.r),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              '${chat.unreadCount[userController.id.value]}',
+                                              style: TextStyle(
+                                                fontSize: 35.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ))
+                                  ],
                                 ),
                                 SizedBox(height: 20.w),
                               ],
