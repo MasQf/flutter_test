@@ -45,7 +45,7 @@ class _HeadBarState extends State<HeadBar> {
           child: ClipRect(
             // ClipRect 限制模糊范围
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
                 height: 180.h,
                 width: 1.sw,

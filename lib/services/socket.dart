@@ -1,5 +1,4 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:test/models/chat.dart';
 import 'package:test/models/message.dart';
 
 class SocketService {

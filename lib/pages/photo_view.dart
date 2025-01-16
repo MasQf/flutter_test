@@ -8,10 +8,12 @@ import 'package:photo_view/photo_view_gallery.dart';
 class PhotoViewPage extends StatefulWidget {
   final List<String> images;
   final int initialIndex;
+  final bool hasPage;
 
   PhotoViewPage({
     required this.images,
     required this.initialIndex,
+    this.hasPage = true,
   });
 
   @override
@@ -64,28 +66,29 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
                 });
               },
             ),
-            Positioned(
-                bottom: 150.h,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: IntrinsicWidth(
-                    child: Container(
-                      height: 50.h,
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      decoration: BoxDecoration(
-                          color: Color.fromARGB(184, 212, 212, 212),
-                          borderRadius: BorderRadius.circular(20.r)),
-                      child: Center(
-                        child: Text(
-                          '${_currentIndex + 1} of ${widget.images.length}',
-                          style:
-                              TextStyle(fontSize: 30.sp, color: Colors.black),
+            if (widget.hasPage)
+              Positioned(
+                  bottom: 150.h,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: IntrinsicWidth(
+                      child: Container(
+                        height: 50.h,
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        decoration: BoxDecoration(
+                            color: Color.fromARGB(184, 212, 212, 212),
+                            borderRadius: BorderRadius.circular(20.r)),
+                        child: Center(
+                          child: Text(
+                            '${_currentIndex + 1} of ${widget.images.length}',
+                            style:
+                                TextStyle(fontSize: 30.sp, color: Colors.black),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                )),
+                  )),
             Positioned(
                 right: 50.w,
                 height: 300.h,

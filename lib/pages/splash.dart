@@ -5,7 +5,6 @@ import 'package:test/api/api.dart';
 import 'package:test/api/user.dart';
 import 'package:test/utils/token.dart';
 import 'package:test/controllers/user.dart';
-import 'package:test/pages/home.dart';
 import 'package:test/pages/login.dart';
 import 'package:test/pages/root.dart';
 

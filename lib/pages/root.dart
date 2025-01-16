@@ -7,6 +7,7 @@ import 'package:test/constants/color.dart';
 import 'package:test/pages/chat_list.dart';
 import 'package:test/pages/home.dart';
 import 'package:test/pages/personal.dart';
+import 'package:test/pages/publish.dart';
 import 'package:test/pages/reset_password.dart';
 
 class RootPage extends StatefulWidget {
@@ -31,7 +32,7 @@ class _RootPageState extends State<RootPage> {
     super.initState();
     _pages = [
       HomePage(),
-      ResetPasswordPage(),
+      PublishPage(),
       ChatListPage(),
       PersonalPage(),
     ];
@@ -57,7 +58,7 @@ class _RootPageState extends State<RootPage> {
               child: ClipRect(
                 // ClipRect 限制模糊范围
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 50), // 高斯模糊参数
+                  filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
                   child: Container(
                     height: 180.h,
                     color: Colors.white.withOpacity(0.2),
@@ -68,27 +69,30 @@ class _RootPageState extends State<RootPage> {
             Row(
               children: [
                 Expanded(
-                  child: CupertinoButton(
-                    padding: EdgeInsets.only(top: 10.h),
-                    child: Column(
-                      children: [
-                        Icon(
-                          _pageIndex == 0
-                              ? CupertinoIcons.house_fill
-                              : CupertinoIcons.house,
-                          size: 80.w,
-                          color: _pageIndex == 0 ? kMainColor : kGrey,
-                        ),
-                        Text(
-                          '首页',
-                          style: TextStyle(
-                              fontSize: 30.sp,
-                              fontWeight: FontWeight.bold,
-                              color: _pageIndex == 0 ? kMainColor : kGrey),
-                        ),
-                      ],
+                  child: Container(
+                    color: Colors.transparent,
+                    child: CupertinoButton(
+                      padding: EdgeInsets.only(top: 10.h),
+                      child: Column(
+                        children: [
+                          Icon(
+                            _pageIndex == 0
+                                ? CupertinoIcons.house_fill
+                                : CupertinoIcons.house,
+                            size: 80.w,
+                            color: _pageIndex == 0 ? kMainColor : kGrey,
+                          ),
+                          Text(
+                            '首页',
+                            style: TextStyle(
+                                fontSize: 30.sp,
+                                fontWeight: FontWeight.bold,
+                                color: _pageIndex == 0 ? kMainColor : kGrey),
+                          ),
+                        ],
+                      ),
+                      onPressed: () => onItemTapped(0),
                     ),
-                    onPressed: () => onItemTapped(0),
                   ),
                 ),
                 Expanded(

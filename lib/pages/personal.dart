@@ -16,6 +16,7 @@ import 'package:test/constants/color.dart';
 import 'package:test/constants/text.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/pages/login.dart';
+import 'package:test/pages/photo_view.dart';
 import 'package:test/utils/token.dart';
 import 'package:test/widgets/cup_button.dart';
 import 'package:dio/dio.dart' as oid;
@@ -153,8 +154,8 @@ class _PersonalPageState extends State<PersonalPage> {
     }
   }
 
-  // 添加图片
-  Future<void> _addImage({bool hasReview = false}) async {
+  // 修改头像
+  Future<void> _changeAvatar({bool hasReview = false}) async {
     // 检查存储和位置权限
     final permissionState = await _getStoragePermission();
     if (!permissionState) {
@@ -168,91 +169,139 @@ class _PersonalPageState extends State<PersonalPage> {
       isScrollControlled: true,
       isDismissible: true,
       enableDrag: false,
+      barrierColor: Colors.black.withOpacity(0.2),
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
-          padding: EdgeInsets.only(bottom: 100.h),
+          height: 0.34.sh,
+          width: 1.sw,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(30.r),
+            color: Colors.transparent,
           ),
+          margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 40.w),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
-              CupertinoButton(
-                child: Container(
-                  width: 1.sw,
-                  height: 100.h,
-                  color: Colors.white,
-                  child: Center(
-                    child: Text('拍摄', style: kContentTitle),
-                  ),
-                ),
-                onPressed: () async {
-                  Get.back();
-                  // 拍照
-                  await _takePhoto();
-                },
-              ),
               Container(
-                width: 1.sw,
-                height: 2.h,
-                color: Color.fromARGB(132, 238, 238, 238),
-              ),
-              CupertinoButton(
-                child: Container(
-                  width: 1.sw,
-                  height: 100.h,
-                  color: Colors.white,
-                  child: Center(
-                    child: Text('从手机相册选择', style: kContentTitle),
-                  ),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
                 ),
-                onPressed: () async {
-                  Get.back();
-                  await _selectPhoto();
-                },
-              ),
-              Container(
                 width: 1.sw,
-                height: hasReview ? 2.h : 20.h,
-                color: Color.fromARGB(132, 238, 238, 238),
-              ),
-              // if (hasReview) ...[
-              //   CupertinoButton(
-              //     child: Container(
-              //       width: 1.sw,
-              //       height: 100.h,
-              //       color: Colors.white,
-              //       child: Center(
-              //         child: Text('预览', style: kContentTitle),
-              //       ),
-              //     ),
-              //     onPressed: () {
-              //       Get.back();
-              //       Get.to(
-              //           () => PhotoViewPage(images: [avatar], initialIndex: 0),
-              //           transition: Transition.cupertino);
-              //     },
-              //   ),
-              //   Container(
-              //     width: 1.sw,
-              //     height: 20.h,
-              //     color: Color.fromARGB(132, 238, 238, 238),
-              //   ),
-              // ],
-              CupertinoButton(
-                child: Container(
-                  width: 1.sw,
-                  height: 100.h,
-                  color: Colors.white,
-                  child: Center(
-                    child: Text('取消', style: kContentTitle),
-                  ),
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30.r),
+                        topRight: Radius.circular(30.r),
+                      ),
+                      child: CupButton(
+                        pressedColor: Color(0xFFdbdbdd),
+                        onPressed: () {
+                          Get.back();
+                          _takePhoto();
+                        },
+                        child: Container(
+                          width: 1.sw,
+                          padding: EdgeInsets.symmetric(vertical: 30.w),
+                          child: Center(
+                            child: Text(
+                              '拍照',
+                              style: TextStyle(
+                                fontSize: 55.sp,
+                                fontWeight: FontWeight.bold,
+                                color: kMainColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 1.sw,
+                      color: kDevideColor,
+                      height: 2.w,
+                    ),
+                    CupButton(
+                      pressedColor: Color(0xFFdbdbdd),
+                      onPressed: () {
+                        Get.back();
+                        _selectPhoto();
+                      },
+                      child: Container(
+                        width: 1.sw,
+                        padding: EdgeInsets.symmetric(vertical: 30.w),
+                        child: Center(
+                          child: Text(
+                            '选取照片',
+                            style: TextStyle(
+                              fontSize: 55.sp,
+                              fontWeight: FontWeight.bold,
+                              color: kMainColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 1.sw,
+                      color: kDevideColor,
+                      height: 2.w,
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(30.r),
+                        bottomRight: Radius.circular(30.r),
+                      ),
+                      child: CupButton(
+                        pressedColor: Color(0xFFdbdbdd),
+                        onPressed: () {
+                          Get.back();
+                          Get.to(
+                            () => PhotoViewPage(
+                                images: [avatar], initialIndex: 0),
+                            transition: Transition.cupertino,
+                          );
+                        },
+                        child: Container(
+                          width: 1.sw,
+                          padding: EdgeInsets.symmetric(vertical: 30.w),
+                          child: Center(
+                            child: Text(
+                              '浏览',
+                              style: TextStyle(
+                                fontSize: 55.sp,
+                                fontWeight: FontWeight.bold,
+                                color: kMainColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20.w),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(30.r),
+                      child: CupButton(
+                        pressedColor: Color(0xFFdbdbdd),
+                        onPressed: () {},
+                        child: Container(
+                          width: 1.sw,
+                          padding: EdgeInsets.symmetric(vertical: 30.w),
+                          child: Center(
+                            child: Text(
+                              '取消',
+                              style: TextStyle(
+                                fontSize: 55.sp,
+                                fontWeight: FontWeight.bold,
+                                color: kMainColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                onPressed: () async {
-                  Get.back();
-                },
-              ),
+              )
             ],
           ),
         );
@@ -279,7 +328,7 @@ class _PersonalPageState extends State<PersonalPage> {
             CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: () async {
-                await _addImage();
+                await _changeAvatar();
               },
               child: Container(
                 width: 230.w,
@@ -336,6 +385,7 @@ class _PersonalPageState extends State<PersonalPage> {
                 children: [
                   infoButton(text: '用户名、电子邮件', onPressed: () {}),
                   infoButton(text: '密码与安全性', onPressed: () {}),
+                  infoButton(text: '评价', onPressed: () {}),
                   infoButton(text: '称号', onPressed: () {}, hasDevider: false),
                 ],
               ),

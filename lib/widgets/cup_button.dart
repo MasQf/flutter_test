@@ -5,6 +5,7 @@ class CupButton extends StatefulWidget {
   final Widget child;
   final Color normalColor;
   final Color pressedColor;
+  final BorderRadiusGeometry? borderRadius;
 
   const CupButton({
     Key? key,
@@ -12,6 +13,7 @@ class CupButton extends StatefulWidget {
     required this.child,
     this.normalColor = CupertinoColors.white,
     this.pressedColor = const Color(0xFFd1d1d5),
+    this.borderRadius,
   }) : super(key: key);
 
   @override
@@ -25,19 +27,26 @@ class _CupButtonState extends State<CupButton> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (_) {
-        setState(() => _isPressed = true);
+        if (mounted) {
+          setState(() => _isPressed = true);
+        }
       },
       onTapCancel: () {
-        setState(() => _isPressed = false);
+        if (mounted) {
+          setState(() => _isPressed = false);
+        }
       },
       onTapUp: (_) {
-        Future.delayed(Duration(milliseconds: 500), () {
-          setState(() => _isPressed = false);
+        Future.delayed(Duration(milliseconds: 300), () {
+          if (mounted) {
+            setState(() => _isPressed = false);
+          }
         });
         widget.onPressed();
       },
       child: Container(
         decoration: BoxDecoration(
+          borderRadius: widget.borderRadius,
           color: _isPressed ? widget.pressedColor : widget.normalColor,
         ),
         child: widget.child,
