@@ -7,7 +7,7 @@ import 'package:test/constants/text.dart';
 import 'package:test/controllers/chat.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/models/chat.dart';
-import 'package:test/pages/chat.dart';
+import 'package:test/pages/chat_detail.dart';
 import 'package:test/services/socket.dart';
 import 'package:test/utils/date.dart';
 import 'package:test/widgets/cup_button.dart';

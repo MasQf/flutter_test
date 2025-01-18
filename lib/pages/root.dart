@@ -8,7 +8,6 @@ import 'package:test/pages/chat_list.dart';
 import 'package:test/pages/home.dart';
 import 'package:test/pages/personal.dart';
 import 'package:test/pages/publish.dart';
-import 'package:test/pages/reset_password.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -77,13 +76,13 @@ class _RootPageState extends State<RootPage> {
                         children: [
                           Icon(
                             _pageIndex == 0
-                                ? CupertinoIcons.house_fill
-                                : CupertinoIcons.house,
+                                ? CupertinoIcons.search
+                                : CupertinoIcons.search,
                             size: 80.w,
                             color: _pageIndex == 0 ? kMainColor : kGrey,
                           ),
                           Text(
-                            '首页',
+                            '发现',
                             style: TextStyle(
                                 fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/controllers/user.dart';
-import 'package:test/pages/chat.dart';
+import 'package:test/pages/chat_detail.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,17 +20,17 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: kBackColor,
       body: Container(
-        // child: CupertinoButton(
-        //   child: Text('Chat With 2184838398'),
-        //   onPressed: () {
-        //     Get.to(() => ChatPage(
-        //           senderId: userController.id.value,
-        //           receiverId: '677cdae12818f8664a8a3427',
-        //           targetName: '2184838398',
-        //         ));
-        //   },
-        // ),
-      ),
+          // child: CupertinoButton(
+          //   child: Text('Chat With 2184838398'),
+          //   onPressed: () {
+          //     Get.to(() => ChatPage(
+          //           senderId: userController.id.value,
+          //           receiverId: '677cdae12818f8664a8a3427',
+          //           targetName: '2184838398',
+          //         ));
+          //   },
+          // ),
+          ),
     );
   }
 }

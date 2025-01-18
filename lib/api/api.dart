@@ -13,6 +13,10 @@ String TOKEN = "";
 
 const String BASE_URL = "http://10.0.2.2:3000";
 
+String replaceLocalhost(String url) {
+  return url.replaceFirst('localhost', '10.0.2.2');
+}
+
 /// api 请求类
 class Api {
   static final Api _instance = Api._internal();

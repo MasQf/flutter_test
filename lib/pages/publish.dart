@@ -4,8 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:get/get.dart';
+import 'package:test/api/api.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/constants/text.dart';
+import 'package:test/controllers/publish.dart';
+import 'package:test/controllers/user.dart';
+import 'package:test/models/item.dart';
+import 'package:test/pages/item_detail.dart';
 import 'package:test/widgets/cup_button.dart';
 
 class PublishPage extends StatefulWidget {
@@ -15,7 +21,11 @@ class PublishPage extends StatefulWidget {
   State<PublishPage> createState() => _PublishPageState();
 }
 
-class _PublishPageState extends State<PublishPage> {
+class _PublishPageState extends State<PublishPage>
+    with TickerProviderStateMixin {
+  PublishController publishController = Get.put(PublishController());
+  UserController userController = Get.find<UserController>();
+
   double _opacity = 0.0; // 用于控制导航栏透明度
 
   String _coordinates = "点击屏幕获取坐标";
@@ -24,6 +34,60 @@ class _PublishPageState extends State<PublishPage> {
   double dy = 0.h;
 
   bool isGrid = true;
+
+  late AnimationController _dotController;
+  late AnimationController _imageController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    publishController.loadPublishList(userId: userController.id.value);
+    _dotController = AnimationController(
+      duration: Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _imageController = AnimationController(
+      duration: Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _imageController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _dotController.dispose();
+    _imageController.dispose();
+    super.dispose();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    _imageController.forward();
+    Future.delayed(const Duration(milliseconds: 200), () {
+      _imageController.reverse();
+      Future.delayed(const Duration(milliseconds: 100), () {
+        Get.to(() => ItemDetailPage(), transition: Transition.cupertino);
+      });
+    });
+  }
+
+  void _onTapCancel() {
+    _imageController.reverse();
+  }
+
+  void toggleControl() {
+    print('toggle pressed');
+    setState(() {
+      showControl = !showControl;
+      if (showControl) {
+        _dotController.forward(); // 展开动画
+      } else {
+        _dotController.reverse(); // 收起动画
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -198,128 +262,165 @@ class _PublishPageState extends State<PublishPage> {
                     ),
                   ),
                   isGrid
-                      ? SliverGrid(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 60.w,
-                            childAspectRatio: 493 / 765,
-                          ),
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              // 计算左右间距
-                              double leftMargin =
-                                  index % 2 == 0 ? 80.w : 0; // 左侧元素加左边距
-                              double rightMargin =
-                                  index % 2 == 1 ? 80.w : 0; // 右侧元素加右边距
-                              return Container(
-                                  margin: EdgeInsets.only(
-                                    left: leftMargin, // 左侧动态边距
-                                    right: rightMargin, // 右侧动态边距
-                                    top: index < 2 ? 50.w : 0,
-                                    bottom: index > 7 ? 80.w : 0,
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        width: 1.sw,
-                                        height: 580.w,
-                                        decoration: BoxDecoration(
-                                          color: CupertinoColors
-                                              .extraLightBackgroundGray,
-                                          borderRadius:
-                                              BorderRadius.circular(10.r),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Color.fromARGB(
-                                                  255, 220, 220, 220),
-                                              blurRadius: 20.w,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(height: 5.w),
-                                      Row(
-                                        children: [
-                                          Spacer(),
-                                          GestureDetector(
-                                            onTapDown:
-                                                (TapDownDetails details) {
-                                              // 获取点击位置的坐标
-                                              setState(() {
-                                                showControl = !showControl;
-                                                _coordinates =
-                                                    "X: ${details.globalPosition.dx}, Y: ${details.globalPosition.dy}";
-                                                dx =
-                                                    (details.globalPosition.dx *
-                                                            2)
-                                                        .w;
-                                                dy =
-                                                    (details.globalPosition.dy *
-                                                            2)
-                                                        .h;
-                                              });
-                                              print(_coordinates);
-                                            },
-                                            child: Icon(
-                                              CupertinoIcons.ellipsis,
-                                              color: kGrey,
-                                              size: 70.w,
+                      ? Obx(
+                          () => SliverGrid(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 60.w,
+                              childAspectRatio: 493 / 765,
+                            ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                ItemModel item =
+                                    publishController.publishList[index];
+                                // 计算左右间距
+                                double leftMargin =
+                                    index % 2 == 0 ? 80.w : 0; // 左侧元素加左边距
+                                double rightMargin =
+                                    index % 2 == 1 ? 80.w : 0; // 右侧元素加右边距
+                                return Container(
+                                    margin: EdgeInsets.only(
+                                      left: leftMargin, // 左侧动态边距
+                                      right: rightMargin, // 右侧动态边距
+                                      top: index < 2 ? 50.w : 0,
+                                      bottom: index > 7 ? 80.w : 0,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Column(
+                                      children: [
+                                        GestureDetector(
+                                          onTapUp: _onTapUp,
+                                          onTapCancel: _onTapCancel,
+                                          child: ScaleTransition(
+                                            scale: _animation,
+                                            child: Container(
+                                              width: 1.sw,
+                                              height: 580.w,
+                                              decoration: BoxDecoration(
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                    replaceLocalhost(
+                                                        item.images[0]),
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                                color: CupertinoColors
+                                                    .extraLightBackgroundGray,
+                                                borderRadius:
+                                                    BorderRadius.circular(10.r),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color.fromARGB(
+                                                        255, 220, 220, 220),
+                                                    blurRadius: 20.w,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ],
-                                      )
-                                    ],
-                                  ));
-                            },
-                            childCount: 9,
+                                        ),
+                                        SizedBox(height: 20.w),
+                                        Container(
+                                          width: double.infinity,
+                                          child: Text(
+                                            item.name,
+                                            style: TextStyle(
+                                              fontSize: 42.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Spacer(),
+                                            GestureDetector(
+                                              onTapDown:
+                                                  (TapDownDetails details) {
+                                                // 获取点击位置的坐标
+                                                setState(() {
+                                                  _coordinates =
+                                                      "X: ${details.globalPosition.dx}, Y: ${details.globalPosition.dy}";
+                                                  dx = (details.globalPosition
+                                                              .dx *
+                                                          2)
+                                                      .w;
+                                                  dy = (details.globalPosition
+                                                              .dy *
+                                                          2)
+                                                      .h;
+                                                });
+                                                toggleControl();
+                                                print(_coordinates);
+                                              },
+                                              child: Baseline(
+                                                baseline: 40.w,
+                                                baselineType:
+                                                    TextBaseline.alphabetic,
+                                                child: Icon(
+                                                  CupertinoIcons.ellipsis,
+                                                  color: kGrey,
+                                                  size: 70.w,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ));
+                              },
+                              childCount: publishController.publishList.length,
+                            ),
                           ),
                         )
-                      : SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              return Column(
-                                children: [
-                                  Container(
-                                      width: 1.sw,
-                                      height: 230.w,
-                                      margin: EdgeInsets.symmetric(
-                                          vertical: 40.w, horizontal: 80.w),
-                                      color: Colors.transparent,
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            height: double.infinity,
-                                            width: 200.w,
-                                            decoration: BoxDecoration(
-                                              color: kDevideColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(10.r),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Color.fromARGB(
-                                                      255, 220, 220, 220),
-                                                  blurRadius: 20.w,
-                                                ),
-                                              ],
-                                            ),
+                      : Obx(
+                          () => SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                return Column(
+                                  children: [
+                                    Container(
+                                        width: 1.sw,
+                                        height: 230.w,
+                                        margin: EdgeInsets.symmetric(
+                                            vertical: 40.w, horizontal: 80.w),
+                                        color: Colors.transparent,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              height: double.infinity,
+                                              width: 200.w,
+                                              decoration: BoxDecoration(
+                                                color: kDevideColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(10.r),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color.fromARGB(
+                                                        255, 220, 220, 220),
+                                                    blurRadius: 20.w,
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        )),
+                                    index < 9 - 1
+                                        ? Container(
+                                            width: 1.sw,
+                                            height: 2.w,
+                                            margin: EdgeInsets.symmetric(
+                                                horizontal: 80.w),
+                                            color: kDevideColor,
                                           )
-                                        ],
-                                      )),
-                                  index < 9 - 1
-                                      ? Container(
-                                          width: 1.sw,
-                                          height: 2.w,
-                                          margin: EdgeInsets.symmetric(
-                                              horizontal: 80.w),
-                                          color: kDevideColor,
-                                        )
-                                      : SizedBox(height: 50.w),
-                                ],
-                              );
-                            },
-                            childCount: 9, // 列表项数量
+                                        : SizedBox(height: 50.w),
+                                  ],
+                                );
+                              },
+                              childCount: 9, // 列表项数量
+                            ),
                           ),
                         ),
                 ],
@@ -373,111 +474,116 @@ class _PublishPageState extends State<PublishPage> {
                 ],
               ),
             ),
-            if (showControl)
-              Positioned(
-                top: dy > 0.5.sh ? dy - 280.h : dy + 40.h,
-                right: 40.w,
-                child: Container(
-                  width: 0.7.sw,
-                  decoration:
-                      BoxDecoration(color: Colors.transparent, boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 500.w,
-                    )
-                  ]),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30.r),
-                          topRight: Radius.circular(30.r),
-                        ),
-                        child: CupButton(
-                          normalColor: Colors.white,
-                          onPressed: () {},
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 40.w,
-                              vertical: 25.w,
+            AnimatedBuilder(
+              animation: _dotController,
+              builder: (context, child) {
+                double opacity = _dotController.value;
+                return Positioned(
+                  top: dy > 0.5.sh ? dy - 280.h : dy + 40.h,
+                  right: 40.w,
+                  child: AnimatedOpacity(
+                    opacity: opacity,
+                    duration: Duration(milliseconds: 50),
+                    child: Container(
+                      width: 0.7.sw,
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 500.w,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(30.r),
+                              topRight: Radius.circular(30.r),
                             ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30.r),
-                                topRight: Radius.circular(30.r),
+                            child: CupButton(
+                              normalColor: Colors.white,
+                              onPressed: () {},
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 40.w,
+                                  vertical: 25.w,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '查看',
+                                      style: TextStyle(
+                                        fontSize: 42.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Icon(
+                                      CupertinoIcons.eye,
+                                      size: 60.w,
+                                      color: Colors.black,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  '查看',
-                                  style: TextStyle(
-                                    fontSize: 42.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                          ),
+                          Container(
+                            width: 1.sw,
+                            height: 20.w,
+                            color: kDevideColor,
+                          ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(30.r),
+                              bottomRight: Radius.circular(30.r),
+                            ),
+                            child: CupButton(
+                              normalColor: Colors.white,
+                              onPressed: () {},
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 40.w,
+                                  vertical: 25.w,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(30.r),
+                                    bottomRight: Radius.circular(30.r),
                                   ),
                                 ),
-                                Spacer(),
-                                Icon(
-                                  CupertinoIcons.eye,
-                                  size: 60.w,
-                                  color: Colors.black,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '删除',
+                                      style: TextStyle(
+                                        fontSize: 42.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: CupertinoColors.destructiveRed,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Icon(
+                                      CupertinoIcons.trash,
+                                      size: 60.w,
+                                      color: CupertinoColors.destructiveRed,
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 1.sw,
-                        height: 20.w,
-                        color: kDevideColor,
-                      ),
-                      ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(30.r),
-                          bottomRight: Radius.circular(30.r),
-                        ),
-                        child: CupButton(
-                          normalColor: Colors.white,
-                          onPressed: () {},
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 40.w,
-                              vertical: 25.w,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(30.r),
-                                bottomRight: Radius.circular(30.r),
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  '删除',
-                                  style: TextStyle(
-                                    fontSize: 42.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: CupertinoColors.destructiveRed,
-                                  ),
-                                ),
-                                Spacer(),
-                                Icon(
-                                  CupertinoIcons.trash,
-                                  size: 60.w,
-                                  color: CupertinoColors.destructiveRed,
-                                ),
-                              ],
-                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
+            ),
           ],
         ),
       ),
