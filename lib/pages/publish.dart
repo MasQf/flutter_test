@@ -379,11 +379,14 @@ class _PublishPageState extends State<PublishPage>
                           () => SliverList(
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
+                                ItemModel item =
+                                    publishController.publishList[index];
+
                                 return Column(
                                   children: [
                                     Container(
                                         width: 1.sw,
-                                        height: 230.w,
+                                        height: 260.w,
                                         margin: EdgeInsets.symmetric(
                                             vertical: 40.w, horizontal: 80.w),
                                         color: Colors.transparent,
@@ -396,6 +399,13 @@ class _PublishPageState extends State<PublishPage>
                                                 color: kDevideColor,
                                                 borderRadius:
                                                     BorderRadius.circular(10.r),
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                    replaceLocalhost(
+                                                        item.images[0]),
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                ),
                                                 boxShadow: [
                                                   BoxShadow(
                                                     color: Color.fromARGB(
@@ -407,7 +417,10 @@ class _PublishPageState extends State<PublishPage>
                                             )
                                           ],
                                         )),
-                                    index < 9 - 1
+                                    index <
+                                            publishController
+                                                    .publishList.length -
+                                                1
                                         ? Container(
                                             width: 1.sw,
                                             height: 2.w,
@@ -419,7 +432,8 @@ class _PublishPageState extends State<PublishPage>
                                   ],
                                 );
                               },
-                              childCount: 9, // 列表项数量
+                              childCount:
+                                  publishController.publishList.length, // 列表项数量
                             ),
                           ),
                         ),
