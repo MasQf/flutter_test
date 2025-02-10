@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -13,13 +14,14 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:test/api/api.dart';
 import 'package:test/api/user.dart';
 import 'package:test/constants/color.dart';
-import 'package:test/constants/text.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/pages/login.dart';
 import 'package:test/pages/photo_view.dart';
 import 'package:test/utils/token.dart';
 import 'package:test/widgets/cup_button.dart';
 import 'package:dio/dio.dart' as oid;
+
+enum PhotoType { avatar, background }
 
 class PersonalPage extends StatefulWidget {
   PersonalPage({super.key});
@@ -33,6 +35,7 @@ class _PersonalPageState extends State<PersonalPage> {
 
   final ImagePicker _picker = ImagePicker();
   String avatar = '';
+  String background = '';
 
   bool isLoading = false;
 
@@ -94,9 +97,8 @@ class _PersonalPageState extends State<PersonalPage> {
   }
 
   //  拍照处理逻辑
-  Future<void> _takePhoto() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.camera);
+  Future<void> _takePhoto({required PhotoType type}) async {
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile == null) {
       return;
@@ -107,22 +109,33 @@ class _PersonalPageState extends State<PersonalPage> {
     // 上传文件
     final String? imageUrl = await uploadFile(imageFile);
     if (imageUrl != null) {
-      setState(() {
-        avatar = imageUrl;
-      });
+      switch (type) {
+        case PhotoType.avatar:
+          setState(() {
+            avatar = imageUrl;
+          });
+          if (avatar.isNotEmpty) {
+            await UserApi.uploadAvator(userId: userController.id.value, avatar: avatar);
+            userController.avatar.value = avatar;
+          }
+          break;
 
-      if (avatar != '') {
-        await UserApi.uploadAvator(
-            userId: userController.id.value, avatar: avatar);
-        userController.avatar.value = avatar;
+        case PhotoType.background:
+          setState(() {
+            background = imageUrl;
+          });
+          if (background.isNotEmpty) {
+            await UserApi.uploadBackground(userId: userController.id.value, background: background);
+            userController.background.value = background;
+          }
+          break;
       }
     }
   }
 
   // 相册选择图片
-  Future<void> _selectPhoto() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery);
+  Future<void> _selectPhoto({required PhotoType type}) async {
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile == null) return; // 用户取消选择
 
@@ -136,13 +149,26 @@ class _PersonalPageState extends State<PersonalPage> {
       // 上传文件
       final String? imageUrl = await uploadFile(imageFile);
       if (imageUrl != null) {
-        setState(() {
-          avatar = imageUrl;
-        });
-        if (avatar != '') {
-          await UserApi.uploadAvator(
-              userId: userController.id.value, avatar: avatar);
-          userController.avatar.value = avatar;
+        switch (type) {
+          case PhotoType.avatar:
+            setState(() {
+              avatar = imageUrl;
+            });
+            if (avatar.isNotEmpty) {
+              await UserApi.uploadAvator(userId: userController.id.value, avatar: avatar);
+              userController.avatar.value = avatar;
+            }
+            break;
+
+          case PhotoType.background:
+            setState(() {
+              background = imageUrl;
+            });
+            if (background.isNotEmpty) {
+              await UserApi.uploadBackground(userId: userController.id.value, background: background);
+              userController.background.value = background;
+            }
+            break;
         }
       }
     } catch (e) {
@@ -154,8 +180,8 @@ class _PersonalPageState extends State<PersonalPage> {
     }
   }
 
-  // 修改头像
-  Future<void> _changeAvatar({bool hasReview = false}) async {
+  // 修改头像或背景图片
+  Future<void> _changePhoto({required PhotoType type, bool hasReview = false}) async {
     // 检查存储和位置权限
     final permissionState = await _getStoragePermission();
     if (!permissionState) {
@@ -173,13 +199,13 @@ class _PersonalPageState extends State<PersonalPage> {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
-          height: 0.34.sh,
           width: 1.sw,
           decoration: BoxDecoration(
             color: Colors.transparent,
           ),
-          margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 40.w),
+          margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 100.w),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 decoration: BoxDecoration(
@@ -197,7 +223,7 @@ class _PersonalPageState extends State<PersonalPage> {
                         pressedColor: Color(0xFFdbdbdd),
                         onPressed: () {
                           Get.back();
-                          _takePhoto();
+                          _takePhoto(type: type);
                         },
                         child: Container(
                           width: 1.sw,
@@ -220,53 +246,25 @@ class _PersonalPageState extends State<PersonalPage> {
                       color: kDevideColor,
                       height: 2.w,
                     ),
-                    CupButton(
-                      pressedColor: Color(0xFFdbdbdd),
-                      onPressed: () {
-                        Get.back();
-                        _selectPhoto();
-                      },
-                      child: Container(
-                        width: 1.sw,
-                        padding: EdgeInsets.symmetric(vertical: 30.w),
-                        child: Center(
-                          child: Text(
-                            '选取照片',
-                            style: TextStyle(
-                              fontSize: 55.sp,
-                              fontWeight: FontWeight.bold,
-                              color: kMainColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 1.sw,
-                      color: kDevideColor,
-                      height: 2.w,
-                    ),
                     ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(30.r),
-                        bottomRight: Radius.circular(30.r),
-                      ),
+                      borderRadius: hasReview
+                          ? BorderRadius.zero
+                          : BorderRadius.only(
+                              bottomLeft: Radius.circular(30.r),
+                              bottomRight: Radius.circular(30.r),
+                            ),
                       child: CupButton(
                         pressedColor: Color(0xFFdbdbdd),
                         onPressed: () {
                           Get.back();
-                          Get.to(
-                            () => PhotoViewPage(
-                                images: [avatar], initialIndex: 0),
-                            transition: Transition.cupertino,
-                          );
+                          _selectPhoto(type: type);
                         },
                         child: Container(
                           width: 1.sw,
                           padding: EdgeInsets.symmetric(vertical: 30.w),
                           child: Center(
                             child: Text(
-                              '浏览',
+                              '选取照片',
                               style: TextStyle(
                                 fontSize: 55.sp,
                                 fontWeight: FontWeight.bold,
@@ -277,6 +275,52 @@ class _PersonalPageState extends State<PersonalPage> {
                         ),
                       ),
                     ),
+                    if (hasReview)
+                      Container(
+                        width: 1.sw,
+                        color: kDevideColor,
+                        height: 2.w,
+                      ),
+                    if (hasReview)
+                      ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(30.r),
+                          bottomRight: Radius.circular(30.r),
+                        ),
+                        child: CupButton(
+                          pressedColor: Color(0xFFdbdbdd),
+                          onPressed: () {
+                            Get.back();
+
+                            switch (type) {
+                              case PhotoType.avatar:
+                                Get.to(
+                                  () => PhotoViewPage(images: [avatar], initialIndex: 0, hasPage: false),
+                                  transition: Transition.cupertino,
+                                );
+                              case PhotoType.background:
+                                Get.to(
+                                  () => PhotoViewPage(images: [background], initialIndex: 0, hasPage: false),
+                                  transition: Transition.cupertino,
+                                );
+                            }
+                          },
+                          child: Container(
+                            width: 1.sw,
+                            padding: EdgeInsets.symmetric(vertical: 30.w),
+                            child: Center(
+                              child: Text(
+                                '查看',
+                                style: TextStyle(
+                                  fontSize: 55.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: kMainColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     SizedBox(height: 20.w),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(30.r),
@@ -313,6 +357,7 @@ class _PersonalPageState extends State<PersonalPage> {
   void initState() {
     super.initState();
     avatar = userController.avatar.value;
+    background = userController.background.value;
   }
 
   @override
@@ -321,6 +366,12 @@ class _PersonalPageState extends State<PersonalPage> {
       backgroundColor: kBackColor,
       body: Container(
         width: 1.sw,
+        decoration: BoxDecoration(
+            // image: DecorationImage(
+            //   image: CachedNetworkImageProvider(replaceLocalhost(background)),
+            //   fit: BoxFit.cover,
+            // ),
+            ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -328,7 +379,7 @@ class _PersonalPageState extends State<PersonalPage> {
             CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: () async {
-                await _changeAvatar();
+                await _changePhoto(type: PhotoType.avatar, hasReview: avatar != '');
               },
               child: Container(
                 width: 230.w,
@@ -338,7 +389,7 @@ class _PersonalPageState extends State<PersonalPage> {
                   shape: BoxShape.circle,
                   image: avatar != ''
                       ? DecorationImage(
-                          image: NetworkImage(avatar),
+                          image: CachedNetworkImageProvider(avatar),
                           fit: BoxFit.cover,
                         )
                       : null,
@@ -386,7 +437,13 @@ class _PersonalPageState extends State<PersonalPage> {
                   infoButton(text: '用户名、电子邮件', onPressed: () {}),
                   infoButton(text: '密码与安全性', onPressed: () {}),
                   infoButton(text: '评价', onPressed: () {}),
-                  infoButton(text: '称号', onPressed: () {}, hasDevider: false),
+                  infoButton(text: '称号', onPressed: () {}),
+                  infoButton(
+                      text: '设置背景',
+                      onPressed: () {
+                        _changePhoto(type: PhotoType.background, hasReview: background != '');
+                      },
+                      hasDevider: false),
                 ],
               ),
             ),
@@ -399,8 +456,7 @@ class _PersonalPageState extends State<PersonalPage> {
                 },
                 child: Container(
                   width: 1.sw,
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 40.w, vertical: 25.w),
+                  padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 25.w),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border.symmetric(

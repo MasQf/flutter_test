@@ -3,11 +3,9 @@ import 'package:test/api/api.dart';
 import 'package:test/models/verification_code.dart';
 
 class UserApi {
-  static Future<dynamic> login(
-      {required String email, required String password}) async {
+  static Future<dynamic> login({required String email, required String password}) async {
     try {
-      final response = await Api()
-          .post('/login', data: {"email": email, "password": password});
+      final response = await Api().post('/login', data: {"email": email, "password": password});
       var data = response.data;
 
       return data;
@@ -17,17 +15,10 @@ class UserApi {
   }
 
   static Future<bool> register(
-      {required String name,
-      required String email,
-      required String code,
-      required String password}) async {
+      {required String name, required String email, required String code, required String password}) async {
     try {
-      final response = await Api().post('/register', data: {
-        "name": name,
-        "email": email,
-        "code": code,
-        "password": password
-      });
+      final response =
+          await Api().post('/register', data: {"name": name, "email": email, "code": code, "password": password});
       var status = response.data['status'];
 
       return status;
@@ -96,8 +87,7 @@ class UserApi {
       // 处理 DioException 的错误
       if (e.type == DioExceptionType.badResponse) {
         // 处理 badResponse 错误
-        String errorMessage =
-            e.response?.data['msg'] ?? 'Failed to send verification code';
+        String errorMessage = e.response?.data['msg'] ?? 'Failed to send verification code';
         return {
           "msg": errorMessage,
           "status": false,
@@ -120,11 +110,22 @@ class UserApi {
     }
   }
 
-  static Future<dynamic> uploadAvator(
-      {required String userId, required String avatar}) async {
+  // 上传头像
+  static Future<dynamic> uploadAvator({required String userId, required String avatar}) async {
     try {
-      final response = await Api()
-          .post('/upload_avatar', data: {"userId": userId, "avatar": avatar});
+      final response = await Api().post('/upload_avatar', data: {"userId": userId, "avatar": avatar});
+      var data = response.data;
+
+      return data;
+    } catch (e) {
+      throw Exception("Error Upload Avator: $e");
+    }
+  }
+
+  // 上传背景图片
+  static Future<dynamic> uploadBackground({required String userId, required String background}) async {
+    try {
+      final response = await Api().post('/upload_background', data: {"userId": userId, "background": background});
       var data = response.data;
 
       return data;

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,11 +23,26 @@ class _ChatListPageState extends State<ChatListPage> {
   ChatController chatController = Get.put(ChatController());
   UserController userController = Get.find<UserController>();
   final SocketService _socketService = SocketService();
+  late String _userId;
 
   @override
   void initState() {
     super.initState();
     chatController.loadChatList(userId: userController.id.value);
+    _userId = userController.id.value;
+    // 用户进入聊天列表页面时加入房间
+    _socketService.connect('http://10.0.2.2:3000');
+    _socketService.joinRoom(_userId);
+    // 监听刷新聊天列表事件
+    _socketService.refreshChatList((data) {
+      print('New message in room: ${data['roomId']}');
+      chatController.loadChatList(userId: userController.id.value);
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -42,7 +58,7 @@ class _ChatListPageState extends State<ChatListPage> {
               return CupButton(
                 onPressed: () {
                   Get.to(
-                    () => ChatPage(
+                    () => ChatDetailPage(
                       senderId: userController.id.value,
                       receiverId: chat.targetUser.id,
                       targetName: chat.targetUser.name,
@@ -52,127 +68,124 @@ class _ChatListPageState extends State<ChatListPage> {
                   );
                 },
                 child: Container(
-                  width: 1.sw,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(width: 40.w),
-                      Column(
-                        children: [
-                          SizedBox(height: 30.w),
-                          Container(
-                            width: 120.w,
-                            height: 120.w,
-                            decoration: BoxDecoration(
-                              color: kBackColor,
-                              borderRadius: BorderRadius.circular(10.r),
-                              image: chat.targetUser.avatar != ''
-                                  ? DecorationImage(
-                                      image:
-                                          NetworkImage(chat.targetUser.avatar),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
-                            ),
-                            child: chat.targetUser.avatar != ''
-                                ? null
-                                : Center(
-                                    child: Icon(
-                                      CupertinoIcons.person_fill,
-                                      size: 110.w,
-                                      color: kGrey,
-                                    ),
-                                  ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(width: 30.w),
-                      Container(
-                        decoration: BoxDecoration(
-                            border: index == chatController.chatList.length - 1
-                                ? null
-                                : Border(
-                                    bottom: BorderSide(
-                                    color: kBackColor,
-                                    width: 2.w,
-                                  ))),
-                        child: Column(
+                    width: 1.sw,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(width: 40.w),
+                        Column(
                           children: [
-                            SizedBox(height: 20.w),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 570.w,
-                                      child: Text(
-                                        chat.targetUser.name,
-                                        style: kPageTitle,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    SizedBox(width: 30.w),
-                                    Text(
-                                      formatDate(chat.lastMessage.time),
-                                      style: TextStyle(
-                                        fontSize: 32.sp,
+                            SizedBox(height: 30.w),
+                            Container(
+                              width: 120.w,
+                              height: 120.w,
+                              decoration: BoxDecoration(
+                                color: kBackColor,
+                                borderRadius: BorderRadius.circular(10.r),
+                                image: chat.targetUser.avatar != ''
+                                    ? DecorationImage(
+                                        image: CachedNetworkImageProvider(chat.targetUser.avatar),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
+                              ),
+                              child: chat.targetUser.avatar != ''
+                                  ? null
+                                  : Center(
+                                      child: Icon(
+                                        CupertinoIcons.person_fill,
+                                        size: 110.w,
                                         color: kGrey,
                                       ),
                                     ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 0.7.sw,
-                                      child: Text(
-                                        chat.lastMessage.content,
-                                        style: TextStyle(
-                                          fontSize: 40.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: kGrey,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 30.w),
-                                    if (chat.unreadCount[
-                                                userController.id.value] !=
-                                            null &&
-                                        chat.unreadCount[
-                                                userController.id.value] !=
-                                            0)
-                                      Container(
-                                          width: 50.w,
-                                          height: 50.w,
-                                          decoration: BoxDecoration(
-                                            color: kMainColor,
-                                            borderRadius:
-                                                BorderRadius.circular(50.r),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              '${chat.unreadCount[userController.id.value]}',
-                                              style: TextStyle(
-                                                fontSize: 35.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ))
-                                  ],
-                                ),
-                                SizedBox(height: 20.w),
-                              ],
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                        SizedBox(width: 30.w),
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: index == chatController.chatList.length - 1
+                                  ? null
+                                  : Border(
+                                      bottom: BorderSide(
+                                      color: kBackColor,
+                                      width: 2.w,
+                                    )),
+                            ),
+                            child: Column(
+                              children: [
+                                SizedBox(height: 20.w),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            chat.targetUser.name,
+                                            style: kPageTitle,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        SizedBox(width: 30.w),
+                                        Text(
+                                          formatDate(chat.lastMessage.time),
+                                          style: TextStyle(
+                                            fontSize: 32.sp,
+                                            color: kGrey,
+                                          ),
+                                        ),
+                                        SizedBox(width: 40.w),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            chat.lastMessage.content,
+                                            style: TextStyle(
+                                              fontSize: 40.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: kGrey,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 30.w),
+                                        if (chat.unreadCount[userController.id.value] != null &&
+                                            chat.unreadCount[userController.id.value] != 0)
+                                          Container(
+                                            width: 50.w,
+                                            height: 50.w,
+                                            decoration: BoxDecoration(
+                                              color: kMainColor,
+                                              borderRadius: BorderRadius.circular(50.r),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                '${chat.unreadCount[userController.id.value]}',
+                                                style: TextStyle(
+                                                  fontSize: 35.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        SizedBox(width: 40.w),
+                                      ],
+                                    ),
+                                    SizedBox(height: 20.w),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
               );
             },
             childCount: chatController.chatList.length,

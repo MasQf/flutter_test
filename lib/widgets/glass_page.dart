@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:test/api/api.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/widgets/head_bar.dart';
 
@@ -10,6 +11,7 @@ class GlassPage extends StatelessWidget {
   final bool? canBack;
   final void Function() pressBack;
   final ScrollController? controller;
+  final String? background;
 
   const GlassPage({
     super.key,
@@ -18,6 +20,7 @@ class GlassPage extends StatelessWidget {
     this.canBack = false,
     this.pressBack = _defaultPressBack,
     this.controller,
+    this.background,
   });
 
   static void _defaultPressBack() {
@@ -30,6 +33,17 @@ class GlassPage extends StatelessWidget {
       backgroundColor: kBackColor,
       body: Stack(
         children: [
+          if (background != null)
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(
+                    replaceLocalhost(background!),
+                  ),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           CustomScrollView(
             controller: controller,
             slivers: [

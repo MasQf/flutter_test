@@ -49,8 +49,7 @@ class _RootPageState extends State<RootPage> {
         height: 180.h, // 设置导航栏高度
         decoration: BoxDecoration(
             color: Colors.transparent, // 设置背景颜色
-            border: Border(
-                top: BorderSide(color: Color.fromARGB(255, 212, 212, 212)))),
+            border: Border(top: BorderSide(color: Color.fromARGB(255, 212, 212, 212)))),
         child: Stack(
           children: [
             Positioned.fill(
@@ -68,16 +67,14 @@ class _RootPageState extends State<RootPage> {
             Row(
               children: [
                 Expanded(
-                  child: Container(
-                    color: Colors.transparent,
-                    child: CupertinoButton(
-                      padding: EdgeInsets.only(top: 10.h),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 8.w),
                       child: Column(
                         children: [
                           Icon(
-                            _pageIndex == 0
-                                ? CupertinoIcons.search
-                                : CupertinoIcons.search,
+                            _pageIndex == 0 ? CupertinoIcons.search : CupertinoIcons.search,
                             size: 80.w,
                             color: _pageIndex == 0 ? kMainColor : kGrey,
                           ),
@@ -90,86 +87,86 @@ class _RootPageState extends State<RootPage> {
                           ),
                         ],
                       ),
-                      onPressed: () => onItemTapped(0),
                     ),
+                    onTap: () => onItemTapped(0),
                   ),
                 ),
                 Expanded(
-                  child: CupertinoButton(
-                    padding: EdgeInsets.only(top: 10.h),
-                    child: Column(
-                      children: [
-                        Icon(
-                          _pageIndex == 1
-                              ? CupertinoIcons.star_fill
-                              : CupertinoIcons.star,
-                          size: 80.w,
-                          color: _pageIndex == 1 ? kMainColor : kGrey,
-                        ),
-                        Text(
-                          '发布',
-                          style: TextStyle(
-                              fontSize: 30.sp,
-                              fontWeight: FontWeight.bold,
-                              color: _pageIndex == 1 ? kMainColor : kGrey),
-                        ),
-                      ],
-                    ),
-                    onPressed: () => onItemTapped(1),
-                  ),
-                ),
-                Expanded(
-                  child: CupertinoButton(
-                    padding: EdgeInsets.only(top: 10.h),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(right: 8.w),
-                          child: Icon(
-                            _pageIndex == 2
-                                ? CupertinoIcons.chat_bubble_fill
-                                : CupertinoIcons.chat_bubble,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 8.w),
+                      child: Column(
+                        children: [
+                          Icon(
+                            _pageIndex == 1 ? CupertinoIcons.star_fill : CupertinoIcons.star,
                             size: 80.w,
-                            color: _pageIndex == 2 ? kMainColor : kGrey,
+                            color: _pageIndex == 1 ? kMainColor : kGrey,
                           ),
-                        ),
-                        Text(
-                          '消息',
-                          style: TextStyle(
-                              fontSize: 30.sp,
-                              fontWeight: FontWeight.bold,
-                              color: _pageIndex == 2 ? kMainColor : kGrey),
-                        ),
-                      ],
+                          Text(
+                            '发布',
+                            style: TextStyle(
+                                fontSize: 30.sp,
+                                fontWeight: FontWeight.bold,
+                                color: _pageIndex == 1 ? kMainColor : kGrey),
+                          ),
+                        ],
+                      ),
                     ),
-                    onPressed: () => onItemTapped(2),
+                    onTap: () => onItemTapped(1),
                   ),
                 ),
                 Expanded(
-                  child: CupertinoButton(
-                    padding: EdgeInsets.only(top: 10.h),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(right: 8.w),
-                          child: Icon(
-                            _pageIndex == 3
-                                ? CupertinoIcons.person_fill
-                                : CupertinoIcons.person,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 8.w),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(right: 8.w),
+                            child: Icon(
+                              _pageIndex == 2 ? CupertinoIcons.chat_bubble_fill : CupertinoIcons.chat_bubble,
+                              size: 80.w,
+                              color: _pageIndex == 2 ? kMainColor : kGrey,
+                            ),
+                          ),
+                          Text(
+                            '消息',
+                            style: TextStyle(
+                                fontSize: 30.sp,
+                                fontWeight: FontWeight.bold,
+                                color: _pageIndex == 2 ? kMainColor : kGrey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    onTap: () => onItemTapped(2),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 8.w),
+                      child: Column(
+                        children: [
+                          Icon(
+                            _pageIndex == 3 ? CupertinoIcons.person_fill : CupertinoIcons.person,
                             size: 80.w,
                             color: _pageIndex == 3 ? kMainColor : kGrey,
                           ),
-                        ),
-                        Text(
-                          '我的',
-                          style: TextStyle(
-                              fontSize: 30.sp,
-                              fontWeight: FontWeight.bold,
-                              color: _pageIndex == 3 ? kMainColor : kGrey),
-                        ),
-                      ],
+                          Text(
+                            '我的',
+                            style: TextStyle(
+                                fontSize: 30.sp,
+                                fontWeight: FontWeight.bold,
+                                color: _pageIndex == 3 ? kMainColor : kGrey),
+                          ),
+                        ],
+                      ),
                     ),
-                    onPressed: () => onItemTapped(3),
+                    onTap: () => onItemTapped(3),
                   ),
                 ),
               ],

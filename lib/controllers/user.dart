@@ -5,4 +5,5 @@ class UserController extends GetxController {
   var name = ''.obs;
   var email = ''.obs;
   var avatar = ''.obs;
+  var background = ''.obs;
 }

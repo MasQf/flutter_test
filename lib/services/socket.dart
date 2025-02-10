@@ -1,8 +1,12 @@
+import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:test/controllers/user.dart';
 import 'package:test/models/message.dart';
 
 class SocketService {
   late IO.Socket socket;
+
+  final UserController userController = Get.find<UserController>();
 
   // 初始化 Socket.IO
   void connect(String serverUrl) {
@@ -11,6 +15,7 @@ class SocketService {
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
+          .setQuery({'userId': userController.id.value}) // 传递 userId
           .build(),
     );
 
@@ -34,9 +39,14 @@ class SocketService {
     print('Joined room: $roomId');
   }
 
+  void leaveRoom(String roomId) {
+    socket.emit('leaveRoom', roomId);
+    print('Leave room: $roomId');
+  }
+
   // 用户进入聊天详情页，通知服务器重置未读消息数
-  void enterChatDetail(String roomId, String userId) {
-    socket.emit('enterChatDetail', {'roomId': roomId, 'userId': userId});
+  void resetUnreadCount(String roomId, String userId) {
+    socket.emit('resetUnreadCount', {'roomId': roomId, 'userId': userId});
     print('User $userId entered chat detail for room $roomId');
   }
 
@@ -52,8 +62,15 @@ class SocketService {
   }
 
   // 接收消息
-  void onMessageReceived(Function(Map<String, dynamic>) callback) {
+  void receiveMessage(Function(Map<String, dynamic>) callback) {
     socket.on('receiveMessage', (data) {
+      callback(data);
+    });
+  }
+
+  // 刷新消息
+  void refreshChatList(Function(Map<String, dynamic>) callback) {
+    socket.on('refreshChatList', (data) {
       callback(data);
     });
   }

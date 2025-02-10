@@ -44,9 +44,9 @@ class _SplashPageState extends State<SplashPage> {
           userController.name.value = res['user']['name'];
           userController.email.value = res['user']['email'];
           userController.avatar.value = res['user']['avatar'];
+          userController.background.value = res['user']['background'];
 
-          Get.offAll(() => RootPage(),
-              transition: Transition.cupertino); // 跳转到首页
+          Get.offAll(() => RootPage(), transition: Transition.cupertino); // 跳转到首页
         } else {
           // 验证失败，跳转到登录页
           Get.offAll(() => LoginPage(), transition: Transition.cupertino);

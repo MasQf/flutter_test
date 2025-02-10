@@ -25,6 +25,7 @@ dependencies:
   mime: ^2.0.0
   http_parser: ^4.0.2
   flutter_sticky_header: ^0.7.0
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:
@@ -50,17 +51,13 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: UnifrakturMaguntia
+      fonts:
+        - asset: assets/fonts/UnifrakturMaguntia-Regular.ttf
+    - family: KaushanScript
+      fonts:
+        - asset: assets/fonts/KaushanScript-Regular.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

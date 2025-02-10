@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:test/constants/color.dart';
 
 class ChatBubblePainter extends CustomPainter {
   final bool isSentByMe;
@@ -15,6 +14,8 @@ class ChatBubblePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // canvas 是由 CustomPaint 创建并传递给 CustomPainter 的 paint 方法,无需手动创建
+    // 如果CustomPaint没有指明size,则painter中的size由child提供
     final paint = Paint()
       ..color = isSentByMe ? myColor : targetColor
       ..style = PaintingStyle.fill;

@@ -1,7 +1,9 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:get/get.dart';
@@ -11,7 +13,7 @@ import 'package:test/constants/text.dart';
 import 'package:test/controllers/publish.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/models/item.dart';
-import 'package:test/pages/item_detail.dart';
+import 'package:test/pages/publish_detail.dart';
 import 'package:test/widgets/cup_button.dart';
 
 class PublishPage extends StatefulWidget {
@@ -21,14 +23,12 @@ class PublishPage extends StatefulWidget {
   State<PublishPage> createState() => _PublishPageState();
 }
 
-class _PublishPageState extends State<PublishPage>
-    with TickerProviderStateMixin {
+class _PublishPageState extends State<PublishPage> with TickerProviderStateMixin {
   PublishController publishController = Get.put(PublishController());
   UserController userController = Get.find<UserController>();
 
   double _opacity = 0.0; // 用于控制导航栏透明度
 
-  String _coordinates = "点击屏幕获取坐标";
   bool showControl = false;
   double dx = 0.w;
   double dy = 0.h;
@@ -36,57 +36,124 @@ class _PublishPageState extends State<PublishPage>
   bool isGrid = true;
 
   late AnimationController _dotController;
-  late AnimationController _imageController;
-  late Animation<double> _animation;
+
+  late List<AnimationController> _animationControllers;
+  late List<Animation<double>> _animations;
+
+  void _initializeAnimations() {
+    // 初始化 AnimationController 和 Animation
+    _animationControllers = List.generate(
+      publishController.publishList.length,
+      (index) => AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 200),
+      ),
+    );
+
+    _animations = _animationControllers.map((controller) {
+      return Tween<double>(begin: 1.0, end: 0.95).animate(
+        CurvedAnimation(parent: controller, curve: Curves.easeInOut),
+      );
+    }).toList();
+  }
 
   @override
   void initState() {
     super.initState();
-    publishController.loadPublishList(userId: userController.id.value);
     _dotController = AnimationController(
       duration: Duration(milliseconds: 200),
       vsync: this,
     );
-    _imageController = AnimationController(
-      duration: Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _animation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _imageController, curve: Curves.easeInOut),
-    );
+    // 加载数据并监听
+    publishController.loadPublishList(userId: userController.id.value).then((_) {
+      _initializeAnimations(); // 数据加载完成后初始化动画
+      setState(() {}); // 刷新界面
+    });
   }
 
   @override
   void dispose() {
     _dotController.dispose();
-    _imageController.dispose();
+    for (var controller in _animationControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
-  void _onTapUp(TapUpDetails details) {
-    _imageController.forward();
+  void _onTapDown(int index, TapDownDetails details) {
+    _animationControllers[index].forward();
+  }
+
+  void _onTapUp(int index, ItemModel item, TapUpDetails details) {
+    _animationControllers[index].forward();
     Future.delayed(const Duration(milliseconds: 200), () {
-      _imageController.reverse();
+      _animationControllers[index].reverse();
       Future.delayed(const Duration(milliseconds: 100), () {
-        Get.to(() => ItemDetailPage(), transition: Transition.cupertino);
+        Get.to(
+          () => PublishDetailPage(
+            item: item,
+            itemList: publishController.publishList.cast<ItemModel>().toList(),
+            initialIndex: index,
+          ),
+          transition: Transition.cupertino,
+          curve: Curves.easeInOut,
+          opaque: false,
+        );
       });
     });
   }
 
-  void _onTapCancel() {
-    _imageController.reverse();
+  void _onTapCancel(int index) {
+    _animationControllers[index].reverse();
   }
 
-  void toggleControl() {
-    print('toggle pressed');
+  String? _currentButtonId; // 当前激活弹窗的按钮ID
+
+  void toggleControl(TapDownDetails details, String buttonId) {
     setState(() {
-      showControl = !showControl;
-      if (showControl) {
-        _dotController.forward(); // 展开动画
-      } else {
+      final newDx = (details.globalPosition.dx * 2).w;
+      final newDy = (details.globalPosition.dy * 2).h;
+
+      // 如果当前是同一个按钮，则直接关闭弹窗
+      if (showControl && _currentButtonId == buttonId) {
+        showControl = false;
         _dotController.reverse(); // 收起动画
+        return;
       }
+
+      // 更新状态和位置
+      dx = newDx;
+      dy = newDy;
+      _currentButtonId = buttonId;
+      showControl = true;
+      _dotController.forward(); // 展开动画
     });
+  }
+
+  // void _check(ItemModel item) {
+  //   toggleControl();
+  //   Get.to(() => ItemDetailPage(item: item), transition: Transition.cupertino);
+  // }
+
+  /// 提取 double 类型的小数点左边和右边的部分
+  Map<String, dynamic> extractParts(double value) {
+    // 转换为字符串，方便分割
+    String valueStr = value.toString();
+
+    // 按小数点分割
+    List<String> parts = valueStr.split('.');
+
+    // 获取整数部分和小数部分
+    String integerPartStr = parts[0]; // 左边部分
+    String fractionalPartStr = parts.length > 1 ? parts[1] : "0"; // 右边部分
+
+    // 返回整数部分和小数部分，字符串和数值两种形式
+    return {
+      'integerPartStr': integerPartStr, // 整数部分（字符串形式）
+      'fractionalPartStr': fractionalPartStr, // 小数部分（字符串形式）
+      'integerPart': int.parse(integerPartStr), // 整数部分（整数形式）
+      'fractionalPart': int.parse(fractionalPartStr), // 小数部分（整数形式）
+    };
   }
 
   @override
@@ -98,15 +165,19 @@ class _PublishPageState extends State<PublishPage>
           if (notification.metrics.axis == Axis.vertical) {
             // 监听垂直滚动位置
             double offset = notification.metrics.pixels;
-            if (offset >= 500.w) {
-              setState(() {
-                _opacity = 1;
-                _opacity = _opacity.clamp(0.0, 1.0); // 确保透明度在 [0, 1]
+            if (offset >= 445.w) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                setState(() {
+                  _opacity = 1;
+                  _opacity = _opacity.clamp(0.0, 1.0); // 确保透明度在 [0, 1]
+                });
               });
             } else {
-              setState(() {
-                _opacity = 0;
-                _opacity = _opacity.clamp(0.0, 1.0); // 确保透明度在 [0, 1]
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                setState(() {
+                  _opacity = 0;
+                  _opacity = _opacity.clamp(0.0, 1.0); // 确保透明度在 [0, 1]
+                });
               });
             }
           }
@@ -115,7 +186,6 @@ class _PublishPageState extends State<PublishPage>
         child: Stack(
           children: [
             Container(
-              // margin: EdgeInsets.symmetric(horizontal: 80.w),
               child: CustomScrollView(
                 slivers: [
                   SliverStickyHeader(
@@ -127,12 +197,15 @@ class _PublishPageState extends State<PublishPage>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '发布',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 90.sp,
-                              fontWeight: FontWeight.bold,
+                          Container(
+                            height: 130.w,
+                            child: Text(
+                              '发布',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 90.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           SizedBox(height: 10.w),
@@ -141,22 +214,19 @@ class _PublishPageState extends State<PublishPage>
                             height: 2.w,
                             width: 1.sw,
                           ),
-                          publishButton(
-                              CupertinoIcons.archivebox_fill, '闲置物品', () {}),
+                          publishButton(CupertinoIcons.archivebox_fill, '闲置物品', () {}),
                           Container(
                             color: kDevideColor,
                             height: 2.w,
                             width: 1.sw,
                           ),
-                          publishButton(
-                              CupertinoIcons.hare_fill, '校园跑腿', () {}),
+                          publishButton(CupertinoIcons.hare_fill, '校园跑腿', () {}),
                           Container(
                             color: kDevideColor,
                             height: 2.w,
                             width: 1.sw,
                           ),
-                          publishButton(
-                              CupertinoIcons.person_3_fill, '组团活动', () {}),
+                          publishButton(CupertinoIcons.person_3_fill, '组团活动', () {}),
                           Container(
                             color: kDevideColor,
                             height: 2.w,
@@ -169,7 +239,6 @@ class _PublishPageState extends State<PublishPage>
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           return Container(
-                            padding: EdgeInsets.only(bottom: 80.w),
                             margin: EdgeInsets.symmetric(horizontal: 80.w),
                             color: Colors.white,
                             child: Column(
@@ -235,18 +304,13 @@ class _PublishPageState extends State<PublishPage>
                                         child: Container(
                                           padding: EdgeInsets.all(10.w),
                                           decoration: BoxDecoration(
-                                            color: isGrid
-                                                ? Colors.transparent
-                                                : Colors.black,
-                                            borderRadius:
-                                                BorderRadius.circular(10.r),
+                                            color: isGrid ? Colors.transparent : Colors.black,
+                                            borderRadius: BorderRadius.circular(10.r),
                                           ),
                                           child: Icon(
                                             CupertinoIcons.list_bullet,
                                             size: 70.w,
-                                            color: isGrid
-                                                ? Colors.black
-                                                : Colors.white,
+                                            color: isGrid ? Colors.black : Colors.white,
                                           ),
                                         ),
                                       ),
@@ -264,55 +328,50 @@ class _PublishPageState extends State<PublishPage>
                   isGrid
                       ? Obx(
                           () => SliverGrid(
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
                               crossAxisSpacing: 60.w,
-                              childAspectRatio: 493 / 765,
+                              childAspectRatio: 493 / 815,
                             ),
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
-                                ItemModel item =
-                                    publishController.publishList[index];
+                                ItemModel item = publishController.publishList[index];
                                 // 计算左右间距
-                                double leftMargin =
-                                    index % 2 == 0 ? 80.w : 0; // 左侧元素加左边距
-                                double rightMargin =
-                                    index % 2 == 1 ? 80.w : 0; // 右侧元素加右边距
+                                double leftMargin = index % 2 == 0 ? 80.w : 0; // 左侧元素加左边距
+                                double rightMargin = index % 2 == 1 ? 80.w : 0; // 右侧元素加右边距
                                 return Container(
-                                    margin: EdgeInsets.only(
-                                      left: leftMargin, // 左侧动态边距
-                                      right: rightMargin, // 右侧动态边距
-                                      top: index < 2 ? 50.w : 0,
-                                      bottom: index > 7 ? 80.w : 0,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Column(
-                                      children: [
-                                        GestureDetector(
-                                          onTapUp: _onTapUp,
-                                          onTapCancel: _onTapCancel,
-                                          child: ScaleTransition(
-                                            scale: _animation,
+                                  margin: EdgeInsets.only(
+                                    left: leftMargin, // 左侧动态边距
+                                    right: rightMargin, // 右侧动态边距
+                                    top: index < 2 ? 50.w : 0,
+                                    bottom: 0,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    children: [
+                                      GestureDetector(
+                                        onTapDown: (details) => _onTapDown(index, details),
+                                        onTapUp: (details) => _onTapUp(index, item, details),
+                                        onTapCancel: () => _onTapCancel(index),
+                                        child: ScaleTransition(
+                                          scale: _animations[index],
+                                          child: Hero(
+                                            tag: '${item.id}',
                                             child: Container(
                                               width: 1.sw,
                                               height: 580.w,
                                               decoration: BoxDecoration(
                                                 image: DecorationImage(
-                                                  image: NetworkImage(
-                                                    replaceLocalhost(
-                                                        item.images[0]),
+                                                  image: CachedNetworkImageProvider(
+                                                    replaceLocalhost(item.images[0]),
                                                   ),
                                                   fit: BoxFit.cover,
                                                 ),
-                                                color: CupertinoColors
-                                                    .extraLightBackgroundGray,
-                                                borderRadius:
-                                                    BorderRadius.circular(10.r),
+                                                color: CupertinoColors.extraLightBackgroundGray,
+                                                borderRadius: BorderRadius.circular(10.r),
                                                 boxShadow: [
                                                   BoxShadow(
-                                                    color: Color.fromARGB(
-                                                        255, 220, 220, 220),
+                                                    color: Color.fromARGB(255, 220, 220, 220),
                                                     blurRadius: 20.w,
                                                   ),
                                                 ],
@@ -320,56 +379,70 @@ class _PublishPageState extends State<PublishPage>
                                             ),
                                           ),
                                         ),
-                                        SizedBox(height: 20.w),
-                                        Container(
-                                          width: double.infinity,
-                                          child: Text(
-                                            item.name,
-                                            style: TextStyle(
-                                              fontSize: 42.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(height: 10.w),
+                                      Container(
+                                        width: double.infinity,
+                                        child: Text(
+                                          item.name,
+                                          style: TextStyle(
+                                            fontSize: 42.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
                                           ),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        Row(
-                                          children: [
-                                            Spacer(),
-                                            GestureDetector(
-                                              onTapDown:
-                                                  (TapDownDetails details) {
-                                                // 获取点击位置的坐标
-                                                setState(() {
-                                                  _coordinates =
-                                                      "X: ${details.globalPosition.dx}, Y: ${details.globalPosition.dy}";
-                                                  dx = (details.globalPosition
-                                                              .dx *
-                                                          2)
-                                                      .w;
-                                                  dy = (details.globalPosition
-                                                              .dy *
-                                                          2)
-                                                      .h;
-                                                });
-                                                toggleControl();
-                                                print(_coordinates);
-                                              },
-                                              child: Baseline(
-                                                baseline: 40.w,
-                                                baselineType:
-                                                    TextBaseline.alphabetic,
-                                                child: Icon(
-                                                  CupertinoIcons.ellipsis,
-                                                  color: kGrey,
-                                                  size: 70.w,
-                                                ),
-                                              ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '￥',
+                                            style: TextStyle(
+                                              fontSize: 30.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: kMainColor,
                                             ),
-                                          ],
-                                        )
-                                      ],
-                                    ));
+                                          ),
+                                          Text(
+                                            '${extractParts(item.price)['integerPartStr']}',
+                                            style: TextStyle(
+                                              fontSize: 60.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: kMainColor,
+                                            ),
+                                          ),
+                                          Text(
+                                            '.',
+                                            style: TextStyle(
+                                              fontSize: 37.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: kMainColor,
+                                            ),
+                                          ),
+                                          Text(
+                                            extractParts(item.price)['fractionalPartStr'],
+                                            style: TextStyle(
+                                              fontSize: 37.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: kMainColor,
+                                            ),
+                                          ),
+                                          Spacer(),
+                                          GestureDetector(
+                                            onTapDown: (TapDownDetails details) {
+                                              toggleControl(details, item.id);
+                                            },
+                                            child: Icon(
+                                              CupertinoIcons.ellipsis,
+                                              color: kGrey,
+                                              size: 70.w,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
                               },
                               childCount: publishController.publishList.length,
                             ),
@@ -379,61 +452,201 @@ class _PublishPageState extends State<PublishPage>
                           () => SliverList(
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
-                                ItemModel item =
-                                    publishController.publishList[index];
+                                ItemModel item = publishController.publishList[index];
 
                                 return Column(
                                   children: [
                                     Container(
                                         width: 1.sw,
                                         height: 260.w,
-                                        margin: EdgeInsets.symmetric(
-                                            vertical: 40.w, horizontal: 80.w),
+                                        margin: EdgeInsets.symmetric(vertical: 40.w, horizontal: 80.w),
                                         color: Colors.transparent,
                                         child: Row(
                                           children: [
-                                            Container(
-                                              height: double.infinity,
-                                              width: 200.w,
-                                              decoration: BoxDecoration(
-                                                color: kDevideColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10.r),
-                                                image: DecorationImage(
-                                                  image: NetworkImage(
-                                                    replaceLocalhost(
-                                                        item.images[0]),
+                                            GestureDetector(
+                                              onTapDown: (details) => _onTapDown(index, details),
+                                              onTapUp: (details) => _onTapUp(index, item, details),
+                                              onTapCancel: () => _onTapCancel(index),
+                                              child: ScaleTransition(
+                                                scale: _animations[index],
+                                                child: Hero(
+                                                  tag: '${item.id}',
+                                                  child: Container(
+                                                    height: double.infinity,
+                                                    width: 200.w,
+                                                    decoration: BoxDecoration(
+                                                      color: kDevideColor,
+                                                      borderRadius: BorderRadius.circular(10.r),
+                                                      image: DecorationImage(
+                                                        image: CachedNetworkImageProvider(
+                                                          replaceLocalhost(item.images[0]),
+                                                        ),
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Color.fromARGB(255, 220, 220, 220),
+                                                          blurRadius: 20.w,
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                  fit: BoxFit.cover,
                                                 ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Color.fromARGB(
-                                                        255, 220, 220, 220),
-                                                    blurRadius: 20.w,
+                                              ),
+                                            ),
+                                            SizedBox(width: 35.w),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(vertical: 30.w),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    width: 600.w,
+                                                    child: Text(
+                                                      item.name,
+                                                      style: TextStyle(
+                                                        fontSize: 37.sp,
+                                                        color: Colors.black,
+                                                        fontWeight: FontWeight.bold,
+                                                        height: 2.w,
+                                                      ),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                    ),
                                                   ),
+                                                  Container(
+                                                    width: 600.w,
+                                                    child: Text(
+                                                      item.description,
+                                                      style: TextStyle(
+                                                        fontSize: 35.sp,
+                                                        color: kGrey,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                    ),
+                                                  ),
+                                                  Spacer(),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 600.w,
+                                                        child: Row(
+                                                          children: [
+                                                            Text(
+                                                              '￥',
+                                                              style: TextStyle(
+                                                                fontSize: 30.sp,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: kMainColor,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              '${extractParts(item.price)['integerPartStr']}',
+                                                              style: TextStyle(
+                                                                fontSize: 50.sp,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: kMainColor,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              '.',
+                                                              style: TextStyle(
+                                                                fontSize: 37.sp,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: kMainColor,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              extractParts(item.price)['fractionalPartStr'],
+                                                              style: TextStyle(
+                                                                fontSize: 37.sp,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: kMainColor,
+                                                              ),
+                                                            ),
+                                                            Spacer(),
+                                                            Container(
+                                                              margin: EdgeInsets.only(right: 10.w),
+                                                              padding:
+                                                                  EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.w),
+                                                              decoration: BoxDecoration(
+                                                                color: Color(0xFF1b4588),
+                                                                borderRadius: BorderRadius.circular(200.r),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  item.category,
+                                                                  style: TextStyle(
+                                                                    fontSize: 30.sp,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: Colors.white,
+                                                                  ),
+                                                                  textHeightBehavior: TextHeightBehavior(
+                                                                    applyHeightToFirstAscent: false,
+                                                                    applyHeightToLastDescent: false,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            if (item.isNegotiable)
+                                                              Container(
+                                                                margin: EdgeInsets.only(right: 10.w),
+                                                                padding: EdgeInsets.symmetric(
+                                                                    horizontal: 15.w, vertical: 5.w),
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.green,
+                                                                  borderRadius: BorderRadius.circular(200.r),
+                                                                ),
+                                                                child: Center(
+                                                                  child: Text(
+                                                                    '可议价',
+                                                                    style: TextStyle(
+                                                                      fontSize: 30.sp,
+                                                                      fontWeight: FontWeight.bold,
+                                                                      color: Colors.white,
+                                                                    ),
+                                                                    textHeightBehavior: TextHeightBehavior(
+                                                                      applyHeightToFirstAscent: false,
+                                                                      applyHeightToLastDescent: false,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            SizedBox(width: 30.w),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      GestureDetector(
+                                                        onTapDown: (TapDownDetails details) {
+                                                          toggleControl(details, item.id);
+                                                        },
+                                                        child: Icon(
+                                                          CupertinoIcons.ellipsis,
+                                                          color: kGrey,
+                                                          size: 60.w,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
                                                 ],
                                               ),
-                                            )
+                                            ),
                                           ],
                                         )),
-                                    index <
-                                            publishController
-                                                    .publishList.length -
-                                                1
+                                    index < publishController.publishList.length - 1
                                         ? Container(
                                             width: 1.sw,
                                             height: 2.w,
-                                            margin: EdgeInsets.symmetric(
-                                                horizontal: 80.w),
+                                            margin: EdgeInsets.symmetric(horizontal: 80.w),
                                             color: kDevideColor,
                                           )
                                         : SizedBox(height: 50.w),
                                   ],
                                 );
                               },
-                              childCount:
-                                  publishController.publishList.length, // 列表项数量
+                              childCount: publishController.publishList.length, // 列表项数量
                             ),
                           ),
                         ),
@@ -519,7 +732,9 @@ class _PublishPageState extends State<PublishPage>
                             ),
                             child: CupButton(
                               normalColor: Colors.white,
-                              onPressed: () {},
+                              onPressed: () {
+                                // _check();
+                              },
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 40.w,

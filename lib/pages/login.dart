@@ -52,9 +52,7 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: '电子邮件',
-                          hintStyle: TextStyle(
-                              fontSize: 37.sp,
-                              color: const Color.fromARGB(255, 198, 198, 198))),
+                          hintStyle: TextStyle(fontSize: 37.sp, color: const Color.fromARGB(255, 198, 198, 198))),
                     ),
                   ),
                 ),
@@ -76,9 +74,7 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: '密码',
-                          hintStyle: TextStyle(
-                              fontSize: 37.sp,
-                              color: const Color.fromARGB(255, 198, 198, 198))),
+                          hintStyle: TextStyle(fontSize: 37.sp, color: const Color.fromARGB(255, 198, 198, 198))),
                     ),
                   ),
                 ),
@@ -105,9 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     onPressed: () async {
                       try {
-                        var res = await UserApi.login(
-                            email: emailController.text,
-                            password: passwordController.text);
+                        var res = await UserApi.login(email: emailController.text, password: passwordController.text);
                         if (res['status']) {
                           String token = res['token'];
                           await saveToken(token);
@@ -117,9 +111,9 @@ class _LoginPageState extends State<LoginPage> {
                           userController.name.value = res['user']['name'];
                           userController.email.value = res['user']['email'];
                           userController.avatar.value = res['user']['avatar'];
+                          userController.background.value = res['user']['background'];
 
-                          Get.to(() => RootPage(),
-                              transition: Transition.cupertino);
+                          Get.to(() => RootPage(), transition: Transition.cupertino);
                         }
                       } catch (e) {
                         print(e);
@@ -147,8 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     onPressed: () {
-                      Get.to(() => RegisterPage(),
-                          transition: Transition.cupertino);
+                      Get.to(() => RegisterPage(), transition: Transition.cupertino);
                     }),
                 CupertinoButton(
                     child: Text(
@@ -160,8 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     onPressed: () {
-                      Get.to(() => ResetPasswordPage(),
-                          transition: Transition.cupertino);
+                      Get.to(() => ResetPasswordPage(), transition: Transition.cupertino);
                     })
               ],
             ),

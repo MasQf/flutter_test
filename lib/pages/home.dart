@@ -20,17 +20,17 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: kBackColor,
       body: Container(
-          // child: CupertinoButton(
-          //   child: Text('Chat With 2184838398'),
-          //   onPressed: () {
-          //     Get.to(() => ChatPage(
-          //           senderId: userController.id.value,
-          //           receiverId: '677cdae12818f8664a8a3427',
-          //           targetName: '2184838398',
-          //         ));
-          //   },
-          // ),
-          ),
+        child: CupertinoButton(
+          child: Text('Chat With 845749043'),
+          onPressed: () {
+            Get.to(() => ChatDetailPage(
+                  senderId: userController.id.value,
+                  receiverId: '677ccaa3517b789f761d9067',
+                  targetName: '845749043',
+                ));
+          },
+        ),
+      ),
     );
   }
 }
