@@ -11,8 +11,8 @@ import 'package:test/models/chat.dart';
 import 'package:test/pages/chat_detail.dart';
 import 'package:test/services/socket.dart';
 import 'package:test/utils/date.dart';
-import 'package:test/widgets/cup_button.dart';
-import 'package:test/widgets/glass_page.dart';
+import 'package:test/widgets/button/cup_button.dart';
+import 'package:test/pages/common/static_title_page.dart';
 
 class ChatListPage extends StatefulWidget {
   @override
@@ -47,7 +47,7 @@ class _ChatListPageState extends State<ChatListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GlassPage(
+    return StaticTitlePage(
       title: '消息',
       canBack: false,
       sliver: Obx(
@@ -84,7 +84,8 @@ class _ChatListPageState extends State<ChatListPage> {
                                 borderRadius: BorderRadius.circular(10.r),
                                 image: chat.targetUser.avatar != ''
                                     ? DecorationImage(
-                                        image: CachedNetworkImageProvider(chat.targetUser.avatar),
+                                        image: CachedNetworkImageProvider(
+                                            chat.targetUser.avatar),
                                         fit: BoxFit.cover,
                                       )
                                     : null,
@@ -105,13 +106,14 @@ class _ChatListPageState extends State<ChatListPage> {
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                              border: index == chatController.chatList.length - 1
-                                  ? null
-                                  : Border(
-                                      bottom: BorderSide(
-                                      color: kBackColor,
-                                      width: 2.w,
-                                    )),
+                              border:
+                                  index == chatController.chatList.length - 1
+                                      ? null
+                                      : Border(
+                                          bottom: BorderSide(
+                                          color: kBackColor,
+                                          width: 2.w,
+                                        )),
                             ),
                             child: Column(
                               children: [
@@ -154,14 +156,19 @@ class _ChatListPageState extends State<ChatListPage> {
                                           ),
                                         ),
                                         SizedBox(width: 30.w),
-                                        if (chat.unreadCount[userController.id.value] != null &&
-                                            chat.unreadCount[userController.id.value] != 0)
+                                        if (chat.unreadCount[
+                                                    userController.id.value] !=
+                                                null &&
+                                            chat.unreadCount[
+                                                    userController.id.value] !=
+                                                0)
                                           Container(
                                             width: 50.w,
                                             height: 50.w,
                                             decoration: BoxDecoration(
                                               color: kMainColor,
-                                              borderRadius: BorderRadius.circular(50.r),
+                                              borderRadius:
+                                                  BorderRadius.circular(50.r),
                                             ),
                                             child: Center(
                                               child: Text(

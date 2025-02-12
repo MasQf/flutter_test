@@ -46,10 +46,11 @@ class _RootPageState extends State<RootPage> {
         children: _pages,
       ),
       bottomNavigationBar: Container(
-        height: 180.h, // 设置导航栏高度
+        height: 210.h, // 设置导航栏高度
         decoration: BoxDecoration(
             color: Colors.transparent, // 设置背景颜色
-            border: Border(top: BorderSide(color: Color.fromARGB(255, 212, 212, 212)))),
+            border: Border(
+                top: BorderSide(color: Color.fromARGB(255, 212, 212, 212)))),
         child: Stack(
           children: [
             Positioned.fill(
@@ -58,7 +59,7 @@ class _RootPageState extends State<RootPage> {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
                   child: Container(
-                    height: 180.h,
+                    height: 210.h,
                     color: Colors.white.withOpacity(0.2),
                   ),
                 ),
@@ -74,7 +75,7 @@ class _RootPageState extends State<RootPage> {
                       child: Column(
                         children: [
                           Icon(
-                            _pageIndex == 0 ? CupertinoIcons.search : CupertinoIcons.search,
+                            CupertinoIcons.search,
                             size: 80.w,
                             color: _pageIndex == 0 ? kMainColor : kGrey,
                           ),
@@ -99,7 +100,7 @@ class _RootPageState extends State<RootPage> {
                       child: Column(
                         children: [
                           Icon(
-                            _pageIndex == 1 ? CupertinoIcons.star_fill : CupertinoIcons.star,
+                            CupertinoIcons.star_fill,
                             size: 80.w,
                             color: _pageIndex == 1 ? kMainColor : kGrey,
                           ),
@@ -126,7 +127,7 @@ class _RootPageState extends State<RootPage> {
                           Padding(
                             padding: EdgeInsets.only(right: 8.w),
                             child: Icon(
-                              _pageIndex == 2 ? CupertinoIcons.chat_bubble_fill : CupertinoIcons.chat_bubble,
+                              CupertinoIcons.chat_bubble_fill,
                               size: 80.w,
                               color: _pageIndex == 2 ? kMainColor : kGrey,
                             ),
@@ -152,7 +153,7 @@ class _RootPageState extends State<RootPage> {
                       child: Column(
                         children: [
                           Icon(
-                            _pageIndex == 3 ? CupertinoIcons.person_fill : CupertinoIcons.person,
+                            CupertinoIcons.person_fill,
                             size: 80.w,
                             color: _pageIndex == 3 ? kMainColor : kGrey,
                           ),

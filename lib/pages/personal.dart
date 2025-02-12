@@ -18,7 +18,7 @@ import 'package:test/controllers/user.dart';
 import 'package:test/pages/login.dart';
 import 'package:test/pages/photo_view.dart';
 import 'package:test/utils/token.dart';
-import 'package:test/widgets/cup_button.dart';
+import 'package:test/widgets/button/cup_button.dart';
 import 'package:dio/dio.dart' as oid;
 
 enum PhotoType { avatar, background }
@@ -98,7 +98,8 @@ class _PersonalPageState extends State<PersonalPage> {
 
   //  拍照处理逻辑
   Future<void> _takePhoto({required PhotoType type}) async {
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile == null) {
       return;
@@ -115,7 +116,8 @@ class _PersonalPageState extends State<PersonalPage> {
             avatar = imageUrl;
           });
           if (avatar.isNotEmpty) {
-            await UserApi.uploadAvator(userId: userController.id.value, avatar: avatar);
+            await UserApi.uploadAvator(
+                userId: userController.id.value, avatar: avatar);
             userController.avatar.value = avatar;
           }
           break;
@@ -125,7 +127,8 @@ class _PersonalPageState extends State<PersonalPage> {
             background = imageUrl;
           });
           if (background.isNotEmpty) {
-            await UserApi.uploadBackground(userId: userController.id.value, background: background);
+            await UserApi.uploadBackground(
+                userId: userController.id.value, background: background);
             userController.background.value = background;
           }
           break;
@@ -135,7 +138,8 @@ class _PersonalPageState extends State<PersonalPage> {
 
   // 相册选择图片
   Future<void> _selectPhoto({required PhotoType type}) async {
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile == null) return; // 用户取消选择
 
@@ -155,7 +159,8 @@ class _PersonalPageState extends State<PersonalPage> {
               avatar = imageUrl;
             });
             if (avatar.isNotEmpty) {
-              await UserApi.uploadAvator(userId: userController.id.value, avatar: avatar);
+              await UserApi.uploadAvator(
+                  userId: userController.id.value, avatar: avatar);
               userController.avatar.value = avatar;
             }
             break;
@@ -165,7 +170,8 @@ class _PersonalPageState extends State<PersonalPage> {
               background = imageUrl;
             });
             if (background.isNotEmpty) {
-              await UserApi.uploadBackground(userId: userController.id.value, background: background);
+              await UserApi.uploadBackground(
+                  userId: userController.id.value, background: background);
               userController.background.value = background;
             }
             break;
@@ -181,7 +187,8 @@ class _PersonalPageState extends State<PersonalPage> {
   }
 
   // 修改头像或背景图片
-  Future<void> _changePhoto({required PhotoType type, bool hasReview = false}) async {
+  Future<void> _changePhoto(
+      {required PhotoType type, bool hasReview = false}) async {
     // 检查存储和位置权限
     final permissionState = await _getStoragePermission();
     if (!permissionState) {
@@ -295,12 +302,18 @@ class _PersonalPageState extends State<PersonalPage> {
                             switch (type) {
                               case PhotoType.avatar:
                                 Get.to(
-                                  () => PhotoViewPage(images: [avatar], initialIndex: 0, hasPage: false),
+                                  () => PhotoViewPage(
+                                      images: [avatar],
+                                      initialIndex: 0,
+                                      hasPage: false),
                                   transition: Transition.cupertino,
                                 );
                               case PhotoType.background:
                                 Get.to(
-                                  () => PhotoViewPage(images: [background], initialIndex: 0, hasPage: false),
+                                  () => PhotoViewPage(
+                                      images: [background],
+                                      initialIndex: 0,
+                                      hasPage: false),
                                   transition: Transition.cupertino,
                                 );
                             }
@@ -326,7 +339,9 @@ class _PersonalPageState extends State<PersonalPage> {
                       borderRadius: BorderRadius.circular(30.r),
                       child: CupButton(
                         pressedColor: Color(0xFFdbdbdd),
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.back();
+                        },
                         child: Container(
                           width: 1.sw,
                           padding: EdgeInsets.symmetric(vertical: 30.w),
@@ -379,7 +394,8 @@ class _PersonalPageState extends State<PersonalPage> {
             CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: () async {
-                await _changePhoto(type: PhotoType.avatar, hasReview: avatar != '');
+                await _changePhoto(
+                    type: PhotoType.avatar, hasReview: avatar != '');
               },
               child: Container(
                 width: 230.w,
@@ -441,7 +457,9 @@ class _PersonalPageState extends State<PersonalPage> {
                   infoButton(
                       text: '设置背景',
                       onPressed: () {
-                        _changePhoto(type: PhotoType.background, hasReview: background != '');
+                        _changePhoto(
+                            type: PhotoType.background,
+                            hasReview: background != '');
                       },
                       hasDevider: false),
                 ],
@@ -456,7 +474,8 @@ class _PersonalPageState extends State<PersonalPage> {
                 },
                 child: Container(
                   width: 1.sw,
-                  padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 25.w),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 40.w, vertical: 25.w),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border.symmetric(

@@ -5,7 +5,7 @@ import 'package:test/api/api.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/widgets/head_bar.dart';
 
-class GlassPage extends StatelessWidget {
+class StaticTitlePage extends StatelessWidget {
   final Widget? sliver;
   final String? title;
   final bool? canBack;
@@ -13,7 +13,7 @@ class GlassPage extends StatelessWidget {
   final ScrollController? controller;
   final String? background;
 
-  const GlassPage({
+  const StaticTitlePage({
     super.key,
     this.sliver,
     this.title = '',

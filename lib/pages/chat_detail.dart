@@ -13,8 +13,8 @@ import 'package:test/models/message.dart';
 import 'package:test/pages/photo_view.dart';
 import 'package:test/services/socket.dart';
 import 'package:test/widgets/chat_bubble.dart';
-import 'package:test/widgets/cup_button.dart';
-import 'package:test/widgets/glass_page.dart';
+import 'package:test/widgets/button/cup_button.dart';
+import 'package:test/pages/common/static_title_page.dart';
 
 class ChatDetailPage extends StatefulWidget {
   final String senderId;
@@ -350,7 +350,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               Container(
                 width: 1.sw,
                 height: 130.w,
-                decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kDevideColor, width: 2.w))),
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(color: kDevideColor, width: 2.w))),
                 child: Stack(
                   children: [
                     Positioned(
@@ -375,7 +377,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         topRight: Radius.circular(30.r),
                       ),
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 30.w),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 40.w, vertical: 30.w),
                         child: Row(
                           children: [
                             CupertinoButton(
@@ -442,7 +445,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           Column(
             children: [
               Expanded(
-                child: GlassPage(
+                child: StaticTitlePage(
                   title: widget.targetName,
                   canBack: true,
                   controller: _scrollController,
@@ -473,32 +476,45 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                             ? Container(
                                 width: 1.sw,
                                 margin: EdgeInsets.only(
-                                    bottom: index == _messages.length - 1 ? lastMarginHeight : 40.w,
+                                    bottom: index == _messages.length - 1
+                                        ? lastMarginHeight
+                                        : 40.w,
                                     top: index == 0 ? 30.w : 0),
                                 padding: EdgeInsets.symmetric(horizontal: 30.w),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    ChatBubble(isSentByMe: true, message: message.content),
+                                    ChatBubble(
+                                        isSentByMe: true,
+                                        message: message.content),
                                     SizedBox(width: 30.w),
                                     CupertinoButton(
                                       padding: EdgeInsets.zero,
                                       onPressed: () {
-                                        _showInfo(avatar: userController.avatar.value, name: userController.name.value);
+                                        _showInfo(
+                                            avatar: userController.avatar.value,
+                                            name: userController.name.value);
                                       },
                                       child: Container(
                                         width: 100.w,
                                         height: 100.w,
                                         decoration: BoxDecoration(
                                             color: Colors.white,
-                                            borderRadius: BorderRadius.circular(10.r),
-                                            image: userController.avatar.value != ''
-                                                ? DecorationImage(
-                                                    image: CachedNetworkImageProvider(userController.avatar.value),
-                                                    fit: BoxFit.cover,
-                                                  )
-                                                : null),
+                                            borderRadius:
+                                                BorderRadius.circular(10.r),
+                                            image:
+                                                userController.avatar.value !=
+                                                        ''
+                                                    ? DecorationImage(
+                                                        image:
+                                                            CachedNetworkImageProvider(
+                                                                userController
+                                                                    .avatar
+                                                                    .value),
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : null),
                                         child: userController.avatar.value != ''
                                             ? null
                                             : Center(
@@ -516,7 +532,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                             : Container(
                                 width: 1.sw,
                                 margin: EdgeInsets.only(
-                                    bottom: index == _messages.length - 1 ? lastMarginHeight : 40.w,
+                                    bottom: index == _messages.length - 1
+                                        ? lastMarginHeight
+                                        : 40.w,
                                     top: index == 0 ? 30.w : 0),
                                 padding: EdgeInsets.symmetric(horizontal: 30.w),
                                 child: Row(
@@ -525,17 +543,23 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                     CupertinoButton(
                                       padding: EdgeInsets.zero,
                                       onPressed: () {
-                                        _showInfo(avatar: widget.targetAvatar, name: widget.targetName);
+                                        _showInfo(
+                                            avatar: widget.targetAvatar,
+                                            name: widget.targetName);
                                       },
                                       child: Container(
                                         width: 100.w,
                                         height: 100.w,
                                         decoration: BoxDecoration(
                                             color: Colors.white,
-                                            borderRadius: BorderRadius.circular(10.r),
+                                            borderRadius:
+                                                BorderRadius.circular(10.r),
                                             image: widget.targetAvatar != ''
                                                 ? DecorationImage(
-                                                    image: CachedNetworkImageProvider(widget.targetAvatar),
+                                                    image:
+                                                        CachedNetworkImageProvider(
+                                                            widget
+                                                                .targetAvatar),
                                                     fit: BoxFit.cover)
                                                 : null),
                                         child: widget.targetAvatar != ''
@@ -550,7 +574,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                       ),
                                     ),
                                     SizedBox(width: 30.w),
-                                    ChatBubble(isSentByMe: false, message: message.content),
+                                    ChatBubble(
+                                        isSentByMe: false,
+                                        message: message.content),
                                   ],
                                 ),
                               );
@@ -610,7 +636,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                     fontSize: 37.sp,
                                     color: CupertinoColors.placeholderText,
                                   ),
-                                  padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 20.w),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 30.w, vertical: 20.w),
                                 ),
                               ),
                             ),

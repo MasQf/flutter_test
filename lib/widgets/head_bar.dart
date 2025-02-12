@@ -93,14 +93,18 @@ class _HeadBarState extends State<HeadBar> {
                   ),
                 ),
                 Spacer(),
-                Container(
-                  height: 80.w,
-                  child: Center(
-                    child: Text(
-                      widget.title,
-                      style: kPageTitle,
+                Row(
+                  children: [
+                    Container(
+                      height: 80.w,
+                      child: Center(
+                        child: Text(
+                          widget.title,
+                          style: kPageTitle,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
                 Spacer(),
                 CupertinoButton(

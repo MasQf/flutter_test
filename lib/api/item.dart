@@ -1,12 +1,11 @@
 import 'package:test/api/api.dart';
 import 'package:test/models/item.dart';
 
-class PublishApi {
-  /// 用户已发布的商品列表
-  static Future<List<ItemModel>> publishList({required String userId}) async {
+class ItemApi {
+  /// 最近发布的列表
+  static Future<List<ItemModel>> latestList() async {
     try {
-      final response =
-          await Api().post('/items_by_user', data: {"userId": userId});
+      final response = await Api().get('/recent_items');
 
       List<dynamic> itemListJson = response.data['items'];
       List<ItemModel> itemList =
@@ -14,7 +13,7 @@ class PublishApi {
 
       return itemList;
     } catch (e) {
-      throw Exception("Error get publish list: $e");
+      throw Exception("Error get latest list: $e");
     }
   }
 }

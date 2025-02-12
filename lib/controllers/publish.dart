@@ -7,7 +7,7 @@ class PublishController extends GetxController {
   // 获取已发布列表
   Future<void> loadPublishList({required String userId}) async {
     try {
-      final itemList = await PublishApi.list(userId: userId);
+      final itemList = await PublishApi.publishList(userId: userId);
       publishList.assignAll(itemList);
     } catch (e) {
       print("Error Load published List: $e");

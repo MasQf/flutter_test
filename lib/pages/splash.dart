@@ -46,7 +46,8 @@ class _SplashPageState extends State<SplashPage> {
           userController.avatar.value = res['user']['avatar'];
           userController.background.value = res['user']['background'];
 
-          Get.offAll(() => RootPage(), transition: Transition.cupertino); // 跳转到首页
+          Get.offAll(() => RootPage(),
+              transition: Transition.cupertino); // 跳转到首页
         } else {
           // 验证失败，跳转到登录页
           Get.offAll(() => LoginPage(), transition: Transition.cupertino);
@@ -61,6 +62,7 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: CupertinoActivityIndicator(),
       ),
