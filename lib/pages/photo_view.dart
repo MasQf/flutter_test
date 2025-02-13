@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:test/api/api.dart';
+import 'package:test/constants/color.dart';
 
 class PhotoViewPage extends StatefulWidget {
   final List<String> images;
@@ -47,7 +49,8 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
               pageController: _pageController,
               builder: (context, index) {
                 return PhotoViewGalleryPageOptions(
-                  imageProvider: NetworkImage(widget.images[index]),
+                  imageProvider:
+                      NetworkImage(replaceLocalhost(widget.images[index])),
                   minScale: PhotoViewComputedScale.contained,
                   maxScale: PhotoViewComputedScale.covered * 2,
                   errorBuilder: (context, error, stackTrace) {
@@ -72,36 +75,45 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
                   left: 0,
                   right: 0,
                   child: Center(
-                    child: IntrinsicWidth(
-                      child: Container(
-                        height: 50.h,
-                        padding: EdgeInsets.symmetric(horizontal: 20.w),
-                        decoration: BoxDecoration(
-                            color: Color.fromARGB(184, 212, 212, 212),
-                            borderRadius: BorderRadius.circular(20.r)),
-                        child: Center(
-                          child: Text(
-                            '${_currentIndex + 1} of ${widget.images.length}',
-                            style:
-                                TextStyle(fontSize: 30.sp, color: Colors.black),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(widget.images.length, (index) {
+                        return AnimatedContainer(
+                          duration: Duration(milliseconds: 100),
+                          margin: EdgeInsets.symmetric(horizontal: 5.w),
+                          width: 20.w,
+                          height: 20.w,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _currentIndex == index
+                                ? Colors.white
+                                : kGrey.withOpacity(0.5),
                           ),
-                        ),
-                      ),
+                        );
+                      }),
                     ),
                   )),
             Positioned(
-                right: 50.w,
-                height: 300.h,
+              right: 50.w,
+              top: 50.w,
+              child: Container(
+                width: 90.w,
+                height: 90.w,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black.withOpacity(0.5),
+                ),
                 child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  child: Center(
+                      child:
+                          Icon(Icons.close, color: Colors.white, size: 60.w)),
                   onPressed: () {
                     Get.back();
                   },
-                  child: Icon(
-                    Icons.close_rounded,
-                    size: 90.w,
-                    color: Colors.white,
-                  ),
-                ))
+                ),
+              ),
+            ),
           ],
         ),
       ),

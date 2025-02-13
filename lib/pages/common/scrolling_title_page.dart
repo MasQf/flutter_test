@@ -23,6 +23,7 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
   UserController userController = Get.find<UserController>();
 
   double _opacity = 0.0;
+  double _scale = 1.0;
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +40,18 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
                   _opacity = _opacity.clamp(0.0, 1.0);
                 });
               });
+            } else if (offset <= 0) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                setState(() {
+                  _scale = (1 - offset / 200).clamp(1.0, 1.2);
+                });
+              });
             } else {
               SchedulerBinding.instance.addPostFrameCallback((_) {
                 setState(() {
                   _opacity = 0;
                   _opacity = _opacity.clamp(0.0, 1.0);
+                  _scale = 1.0;
                 });
               });
             }
@@ -61,15 +69,18 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        height: 130.w,
-                        margin: EdgeInsets.symmetric(horizontal: 80.w),
-                        child: Text(
-                          widget.title,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 90.sp,
-                            fontWeight: FontWeight.bold,
+                      Transform.scale(
+                        scale: _scale,
+                        child: Container(
+                          height: 130.w,
+                          margin: EdgeInsets.symmetric(horizontal: 80.w),
+                          child: Text(
+                            widget.title,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 90.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),

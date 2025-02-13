@@ -77,14 +77,15 @@ class _RootPageState extends State<RootPage> {
                           Icon(
                             CupertinoIcons.search,
                             size: 80.w,
-                            color: _pageIndex == 0 ? kMainColor : kGrey,
+                            color: _pageIndex == 0 ? kMainColor : kIconGrey,
                           ),
                           Text(
                             '发现',
                             style: TextStyle(
                                 fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,
-                                color: _pageIndex == 0 ? kMainColor : kGrey),
+                                color:
+                                    _pageIndex == 0 ? kMainColor : kIconGrey),
                           ),
                         ],
                       ),
@@ -102,14 +103,15 @@ class _RootPageState extends State<RootPage> {
                           Icon(
                             CupertinoIcons.star_fill,
                             size: 80.w,
-                            color: _pageIndex == 1 ? kMainColor : kGrey,
+                            color: _pageIndex == 1 ? kMainColor : kIconGrey,
                           ),
                           Text(
                             '发布',
                             style: TextStyle(
                                 fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,
-                                color: _pageIndex == 1 ? kMainColor : kGrey),
+                                color:
+                                    _pageIndex == 1 ? kMainColor : kIconGrey),
                           ),
                         ],
                       ),
@@ -129,7 +131,7 @@ class _RootPageState extends State<RootPage> {
                             child: Icon(
                               CupertinoIcons.chat_bubble_fill,
                               size: 80.w,
-                              color: _pageIndex == 2 ? kMainColor : kGrey,
+                              color: _pageIndex == 2 ? kMainColor : kIconGrey,
                             ),
                           ),
                           Text(
@@ -137,7 +139,8 @@ class _RootPageState extends State<RootPage> {
                             style: TextStyle(
                                 fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,
-                                color: _pageIndex == 2 ? kMainColor : kGrey),
+                                color:
+                                    _pageIndex == 2 ? kMainColor : kIconGrey),
                           ),
                         ],
                       ),
@@ -155,14 +158,15 @@ class _RootPageState extends State<RootPage> {
                           Icon(
                             CupertinoIcons.person_fill,
                             size: 80.w,
-                            color: _pageIndex == 3 ? kMainColor : kGrey,
+                            color: _pageIndex == 3 ? kMainColor : kIconGrey,
                           ),
                           Text(
                             '我的',
                             style: TextStyle(
                                 fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,
-                                color: _pageIndex == 3 ? kMainColor : kGrey),
+                                color:
+                                    _pageIndex == 3 ? kMainColor : kIconGrey),
                           ),
                         ],
                       ),

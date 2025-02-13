@@ -28,6 +28,7 @@ class _PublishPageState extends State<PublishPage>
     with TickerProviderStateMixin {
   PublishController publishController = Get.put(PublishController());
   UserController userController = Get.find<UserController>();
+  final ScrollController _scrollController = ScrollController();
 
   double _opacity = 0.0; // 用于控制导航栏透明度
 
@@ -77,6 +78,7 @@ class _PublishPageState extends State<PublishPage>
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _dotController.dispose();
     for (var controller in _animationControllers) {
       controller.dispose();
@@ -101,7 +103,7 @@ class _PublishPageState extends State<PublishPage>
           () => PublishDetailPage(
             item: item,
             itemList: publishController.publishList.cast<ItemModel>().toList(),
-            initialIndex: index,
+            initialItemIndex: index,
           ),
           transition: Transition.cupertino,
           curve: Curves.easeInOut,
@@ -166,6 +168,18 @@ class _PublishPageState extends State<PublishPage>
     };
   }
 
+  Color getCategoryColor(String category) {
+    if (category == "闲置物品") {
+      return Color(0xFF1b4588); // 蓝色
+    } else if (category == "组织活动") {
+      return Color(0xFFf09a37); // 橙色
+    } else if (category == "校园跑腿") {
+      return Colors.black; // 黑色
+    } else {
+      return Colors.grey; // 默认颜色
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,196 +218,201 @@ class _PublishPageState extends State<PublishPage>
           },
           child: Stack(
             children: [
-              Container(
-                child: CustomScrollView(
-                  slivers: [
-                    SliverStickyHeader(
-                      header: Container(
-                        padding: EdgeInsets.only(top: 0.1.sh),
-                        margin: EdgeInsets.symmetric(horizontal: 80.w),
-                        color: Colors.white,
-                        alignment: Alignment.centerLeft,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 130.w,
-                              child: Text(
-                                '发布',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 90.sp,
-                                  fontWeight: FontWeight.bold,
+              CupertinoScrollbar(
+                controller: _scrollController,
+                thickness: 10.w,
+                thicknessWhileDragging: 16.w,
+                radius: Radius.circular(10.r),
+                child: Container(
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    slivers: [
+                      SliverStickyHeader(
+                        header: Container(
+                          padding: EdgeInsets.only(top: 0.1.sh),
+                          margin: EdgeInsets.symmetric(horizontal: 80.w),
+                          color: Colors.white,
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                height: 130.w,
+                                child: Text(
+                                  '发布',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 90.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 10.w),
-                            Container(
-                              color: kDevideColor,
-                              height: 2.w,
-                              width: 1.sw,
-                            ),
-                            bigButton(
-                                CupertinoIcons.archivebox_fill, '闲置物品', () {}),
-                            Container(
-                              color: kDevideColor,
-                              height: 2.w,
-                              width: 1.sw,
-                            ),
-                            bigButton(CupertinoIcons.hare_fill, '校园跑腿', () {}),
-                            Container(
-                              color: kDevideColor,
-                              height: 2.w,
-                              width: 1.sw,
-                            ),
-                            bigButton(
-                                CupertinoIcons.person_3_fill, '组团活动', () {}),
-                            Container(
-                              color: kDevideColor,
-                              height: 2.w,
-                              width: 1.sw,
-                            ),
-                          ],
+                              SizedBox(height: 10.w),
+                              Container(
+                                color: kDevideColor,
+                                height: 2.w,
+                                width: 1.sw,
+                              ),
+                              bigButton(CupertinoIcons.archivebox_fill, '闲置物品',
+                                  () {}),
+                              Container(
+                                color: kDevideColor,
+                                height: 2.w,
+                                width: 1.sw,
+                              ),
+                              bigButton(
+                                  CupertinoIcons.hare_fill, '校园跑腿', () {}),
+                              Container(
+                                color: kDevideColor,
+                                height: 2.w,
+                                width: 1.sw,
+                              ),
+                              bigButton(
+                                  CupertinoIcons.person_3_fill, '组织活动', () {}),
+                              Container(
+                                color: kDevideColor,
+                                height: 2.w,
+                                width: 1.sw,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            return Container(
-                              margin: EdgeInsets.symmetric(horizontal: 80.w),
-                              color: Colors.white,
-                              child: Column(
-                                children: [
-                                  Container(
-                                    width: 1.sw,
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 40.w),
-                                    child: Text(
-                                      '7件物品、1个跑腿、1个活动',
-                                      style: TextStyle(
-                                        fontSize: 40.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: kGrey,
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              return Container(
+                                margin: EdgeInsets.symmetric(horizontal: 80.w),
+                                color: Colors.white,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      width: 1.sw,
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 40.w),
+                                      child: Text(
+                                        '7件物品、1个跑腿、1个活动',
+                                        style: TextStyle(
+                                          fontSize: 40.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: kGrey,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Container(
-                                    color: kDevideColor,
-                                    height: 2.w,
-                                    width: 1.sw,
-                                  ),
-                                  Container(
-                                    width: 1.sw,
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 30.w),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          '排序方式',
-                                          style: TextStyle(
-                                            fontSize: 35.sp,
-                                            color: kGrey,
+                                    Container(
+                                      color: kDevideColor,
+                                      height: 2.w,
+                                      width: 1.sw,
+                                    ),
+                                    Container(
+                                      width: 1.sw,
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 30.w),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            '排序方式',
+                                            style: TextStyle(
+                                              fontSize: 35.sp,
+                                              color: kGrey,
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(width: 30.w),
-                                        CupertinoButton(
-                                          onPressed: () {},
-                                          padding: EdgeInsets.zero,
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                '最近发布',
-                                                style: TextStyle(
-                                                  fontSize: 35.sp,
+                                          SizedBox(width: 30.w),
+                                          CupertinoButton(
+                                            onPressed: () {},
+                                            padding: EdgeInsets.zero,
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  '最近发布',
+                                                  style: TextStyle(
+                                                    fontSize: 35.sp,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 20.w),
+                                                Icon(
+                                                  CupertinoIcons.chevron_down,
+                                                  size: 30.w,
                                                   color: Colors.black,
                                                 ),
-                                              ),
-                                              SizedBox(width: 20.w),
-                                              Icon(
-                                                CupertinoIcons.chevron_down,
-                                                size: 30.w,
-                                                color: Colors.black,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Spacer(),
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              showControl = false;
-                                              _dotController.reverse();
-                                              isGrid = !isGrid;
-                                            });
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.all(10.w),
-                                            decoration: BoxDecoration(
-                                              color: isGrid
-                                                  ? Colors.transparent
-                                                  : Colors.black,
-                                              borderRadius:
-                                                  BorderRadius.circular(10.r),
-                                            ),
-                                            child: Icon(
-                                              CupertinoIcons.list_bullet,
-                                              size: 70.w,
-                                              color: isGrid
-                                                  ? Colors.black
-                                                  : Colors.white,
+                                              ],
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                          Spacer(),
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                showControl = false;
+                                                _dotController.reverse();
+                                                isGrid = !isGrid;
+                                              });
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(10.w),
+                                              decoration: BoxDecoration(
+                                                color: isGrid
+                                                    ? Colors.transparent
+                                                    : Colors.black,
+                                                borderRadius:
+                                                    BorderRadius.circular(10.r),
+                                              ),
+                                              child: Icon(
+                                                CupertinoIcons.list_bullet,
+                                                size: 70.w,
+                                                color: isGrid
+                                                    ? Colors.black
+                                                    : Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                          childCount: 1,
+                                  ],
+                                ),
+                              );
+                            },
+                            childCount: 1,
+                          ),
                         ),
                       ),
-                    ),
-                    isGrid
-                        ? Obx(
-                            () => SliverGrid(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 60.w,
-                                childAspectRatio: 493 / 815,
-                              ),
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  ItemModel item =
-                                      publishController.publishList[index];
-                                  // 计算左右间距
-                                  double leftMargin =
-                                      index % 2 == 0 ? 80.w : 0; // 左侧元素加左边距
-                                  double rightMargin =
-                                      index % 2 == 1 ? 80.w : 0; // 右侧元素加右边距
-                                  return Container(
-                                    margin: EdgeInsets.only(
-                                      left: leftMargin, // 左侧动态边距
-                                      right: rightMargin, // 右侧动态边距
-                                      top: index < 2 ? 50.w : 0,
-                                      bottom: 0,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Column(
-                                      children: [
-                                        GestureDetector(
-                                          onTapDown: (details) =>
-                                              _onTapDown(index, details),
-                                          onTapUp: (details) =>
-                                              _onTapUp(index, item, details),
-                                          onTapCancel: () =>
-                                              _onTapCancel(index),
-                                          child: ScaleTransition(
-                                            scale: _animations[index],
-                                            child: Hero(
-                                              tag: '${item.id}',
+                      isGrid
+                          ? Obx(
+                              () => SliverGrid(
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 60.w,
+                                  childAspectRatio: 493 / 815,
+                                ),
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                    ItemModel item =
+                                        publishController.publishList[index];
+                                    // 计算左右间距
+                                    double leftMargin =
+                                        index % 2 == 0 ? 80.w : 0; // 左侧元素加左边距
+                                    double rightMargin =
+                                        index % 2 == 1 ? 80.w : 0; // 右侧元素加右边距
+                                    return Container(
+                                      margin: EdgeInsets.only(
+                                        left: leftMargin, // 左侧动态边距
+                                        right: rightMargin, // 右侧动态边距
+                                        top: index < 2 ? 50.w : 0,
+                                        bottom: 0,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Column(
+                                        children: [
+                                          GestureDetector(
+                                            onTapDown: (details) =>
+                                                _onTapDown(index, details),
+                                            onTapUp: (details) =>
+                                                _onTapUp(index, item, details),
+                                            onTapCancel: () =>
+                                                _onTapCancel(index),
+                                            child: ScaleTransition(
+                                              scale: _animations[index],
                                               child: Container(
                                                 width: 1.sw,
                                                 height: 580.w,
@@ -422,111 +441,112 @@ class _PublishPageState extends State<PublishPage>
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(height: 10.w),
-                                        Container(
-                                          width: double.infinity,
-                                          child: Text(
-                                            item.name,
-                                            style: TextStyle(
-                                              fontSize: 42.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
+                                          SizedBox(height: 10.w),
+                                          Container(
+                                            width: double.infinity,
+                                            child: Text(
+                                              item.name,
+                                              style: TextStyle(
+                                                fontSize: 42.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        ),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              '￥',
-                                              style: TextStyle(
-                                                fontSize: 30.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: kMainColor,
-                                              ),
-                                            ),
-                                            Text(
-                                              '${extractParts(item.price)['integerPartStr']}',
-                                              style: TextStyle(
-                                                fontSize: 60.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: kMainColor,
-                                              ),
-                                            ),
-                                            Text(
-                                              '.',
-                                              style: TextStyle(
-                                                fontSize: 37.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: kMainColor,
-                                              ),
-                                            ),
-                                            Text(
-                                              extractParts(item.price)[
-                                                  'fractionalPartStr'],
-                                              style: TextStyle(
-                                                fontSize: 37.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: kMainColor,
-                                              ),
-                                            ),
-                                            Spacer(),
-                                            GestureDetector(
-                                              onTapDown:
-                                                  (TapDownDetails details) {
-                                                if (showControl) {
-                                                  showControl = false;
-                                                  _dotController.reverse();
-                                                  return;
-                                                }
-                                                toggleControl(details, item.id);
-                                              },
-                                              child: Icon(
-                                                CupertinoIcons.ellipsis,
-                                                color: kGrey,
-                                                size: 70.w,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                                childCount:
-                                    publishController.publishList.length,
-                              ),
-                            ),
-                          )
-                        : Obx(
-                            () => SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  ItemModel item =
-                                      publishController.publishList[index];
-
-                                  return Column(
-                                    children: [
-                                      Container(
-                                          width: 1.sw,
-                                          height: 260.w,
-                                          margin: EdgeInsets.symmetric(
-                                              vertical: 40.w, horizontal: 80.w),
-                                          color: Colors.transparent,
-                                          child: Row(
+                                          Row(
                                             children: [
+                                              Text(
+                                                '￥',
+                                                style: TextStyle(
+                                                  fontSize: 30.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: kMainColor,
+                                                ),
+                                              ),
+                                              Text(
+                                                '${extractParts(item.price)['integerPartStr']}',
+                                                style: TextStyle(
+                                                  fontSize: 60.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: kMainColor,
+                                                ),
+                                              ),
+                                              Text(
+                                                '.',
+                                                style: TextStyle(
+                                                  fontSize: 37.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: kMainColor,
+                                                ),
+                                              ),
+                                              Text(
+                                                extractParts(item.price)[
+                                                    'fractionalPartStr'],
+                                                style: TextStyle(
+                                                  fontSize: 37.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: kMainColor,
+                                                ),
+                                              ),
+                                              Spacer(),
                                               GestureDetector(
-                                                onTapDown: (details) =>
-                                                    _onTapDown(index, details),
-                                                onTapUp: (details) => _onTapUp(
-                                                    index, item, details),
-                                                onTapCancel: () =>
-                                                    _onTapCancel(index),
-                                                child: ScaleTransition(
-                                                  scale: _animations[index],
-                                                  child: Hero(
-                                                    tag: '${item.id}',
+                                                onTapDown:
+                                                    (TapDownDetails details) {
+                                                  if (showControl) {
+                                                    showControl = false;
+                                                    _dotController.reverse();
+                                                    return;
+                                                  }
+                                                  toggleControl(
+                                                      details, item.id);
+                                                },
+                                                child: Icon(
+                                                  CupertinoIcons.ellipsis,
+                                                  color: kGrey,
+                                                  size: 70.w,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                  childCount:
+                                      publishController.publishList.length,
+                                ),
+                              ),
+                            )
+                          : Obx(
+                              () => SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                    ItemModel item =
+                                        publishController.publishList[index];
+
+                                    return Column(
+                                      children: [
+                                        Container(
+                                            width: 1.sw,
+                                            height: 260.w,
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 40.w,
+                                                horizontal: 80.w),
+                                            color: Colors.transparent,
+                                            child: Row(
+                                              children: [
+                                                GestureDetector(
+                                                  onTapDown: (details) =>
+                                                      _onTapDown(
+                                                          index, details),
+                                                  onTapUp: (details) =>
+                                                      _onTapUp(
+                                                          index, item, details),
+                                                  onTapCancel: () =>
+                                                      _onTapCancel(index),
+                                                  child: ScaleTransition(
+                                                    scale: _animations[index],
                                                     child: Container(
                                                       height: double.infinity,
                                                       width: 200.w,
@@ -558,153 +578,108 @@ class _PublishPageState extends State<PublishPage>
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                              SizedBox(width: 35.w),
-                                              Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 30.w),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      width: 600.w,
-                                                      child: Text(
-                                                        item.name,
-                                                        style: TextStyle(
-                                                          fontSize: 37.sp,
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          height: 2.w,
+                                                SizedBox(width: 35.w),
+                                                Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      vertical: 30.w),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Container(
+                                                        width: 600.w,
+                                                        child: Text(
+                                                          item.name,
+                                                          style: TextStyle(
+                                                            fontSize: 37.sp,
+                                                            color: Colors.black,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            height: 2.w,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
                                                         ),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        maxLines: 1,
                                                       ),
-                                                    ),
-                                                    Container(
-                                                      width: 600.w,
-                                                      child: Text(
-                                                        item.description,
-                                                        style: TextStyle(
-                                                          fontSize: 35.sp,
-                                                          color: kGrey,
-                                                          fontWeight:
-                                                              FontWeight.bold,
+                                                      Container(
+                                                        width: 600.w,
+                                                        child: Text(
+                                                          item.description,
+                                                          style: TextStyle(
+                                                            fontSize: 35.sp,
+                                                            color: kGrey,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
                                                         ),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        maxLines: 1,
                                                       ),
-                                                    ),
-                                                    Spacer(),
-                                                    Row(
-                                                      children: [
-                                                        Container(
-                                                          width: 600.w,
-                                                          child: Row(
-                                                            children: [
-                                                              Text(
-                                                                '￥',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize:
-                                                                      30.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      kMainColor,
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                '${extractParts(item.price)['integerPartStr']}',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize:
-                                                                      50.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      kMainColor,
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                '.',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize:
-                                                                      37.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      kMainColor,
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                extractParts(item
-                                                                        .price)[
-                                                                    'fractionalPartStr'],
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize:
-                                                                      37.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      kMainColor,
-                                                                ),
-                                                              ),
-                                                              Spacer(),
-                                                              Container(
-                                                                margin: EdgeInsets
-                                                                    .only(
-                                                                        right: 10
-                                                                            .w),
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
-                                                                        horizontal: 15
-                                                                            .w,
-                                                                        vertical:
-                                                                            5.w),
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Color(
-                                                                      0xFF1b4588),
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              200.r),
-                                                                ),
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    item.category,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          30.sp,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Colors
-                                                                          .white,
-                                                                    ),
-                                                                    textHeightBehavior:
-                                                                        TextHeightBehavior(
-                                                                      applyHeightToFirstAscent:
-                                                                          false,
-                                                                      applyHeightToLastDescent:
-                                                                          false,
-                                                                    ),
+                                                      Spacer(),
+                                                      Row(
+                                                        children: [
+                                                          Container(
+                                                            width: 600.w,
+                                                            child: Row(
+                                                              children: [
+                                                                Text(
+                                                                  '￥',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        30.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        kMainColor,
                                                                   ),
                                                                 ),
-                                                              ),
-                                                              if (item
-                                                                  .isNegotiable)
+                                                                Text(
+                                                                  '${extractParts(item.price)['integerPartStr']}',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        50.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        kMainColor,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  '.',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        37.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        kMainColor,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  extractParts(item
+                                                                          .price)[
+                                                                      'fractionalPartStr'],
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        37.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        kMainColor,
+                                                                  ),
+                                                                ),
+                                                                Spacer(),
                                                                 Container(
                                                                   margin: EdgeInsets
                                                                       .only(
@@ -717,15 +692,15 @@ class _PublishPageState extends State<PublishPage>
                                                                           5.w),
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: Colors
-                                                                        .green,
+                                                                    color: getCategoryColor(
+                                                                        item.category),
                                                                     borderRadius:
                                                                         BorderRadius.circular(
                                                                             200.r),
                                                                   ),
                                                                   child: Center(
                                                                     child: Text(
-                                                                      '可议价',
+                                                                      item.category,
                                                                       style:
                                                                           TextStyle(
                                                                         fontSize:
@@ -745,61 +720,106 @@ class _PublishPageState extends State<PublishPage>
                                                                     ),
                                                                   ),
                                                                 ),
-                                                              SizedBox(
-                                                                  width: 30.w),
-                                                            ],
+                                                                if (item
+                                                                    .isNegotiable)
+                                                                  Container(
+                                                                    margin: EdgeInsets.only(
+                                                                        right: 10
+                                                                            .w),
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        horizontal: 15
+                                                                            .w,
+                                                                        vertical:
+                                                                            5.w),
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      color: Colors
+                                                                          .green,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              200.r),
+                                                                    ),
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          Text(
+                                                                        '可议价',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              30.sp,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                          color:
+                                                                              Colors.white,
+                                                                        ),
+                                                                        textHeightBehavior:
+                                                                            TextHeightBehavior(
+                                                                          applyHeightToFirstAscent:
+                                                                              false,
+                                                                          applyHeightToLastDescent:
+                                                                              false,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                SizedBox(
+                                                                    width:
+                                                                        30.w),
+                                                              ],
+                                                            ),
                                                           ),
-                                                        ),
-                                                        GestureDetector(
-                                                          onTapDown:
-                                                              (TapDownDetails
-                                                                  details) {
-                                                            if (showControl) {
-                                                              showControl =
-                                                                  false;
-                                                              _dotController
-                                                                  .reverse();
-                                                              return;
-                                                            }
-                                                            toggleControl(
-                                                                details,
-                                                                item.id);
-                                                          },
-                                                          child: Icon(
-                                                            CupertinoIcons
-                                                                .ellipsis,
-                                                            color: kGrey,
-                                                            size: 60.w,
+                                                          GestureDetector(
+                                                            onTapDown:
+                                                                (TapDownDetails
+                                                                    details) {
+                                                              if (showControl) {
+                                                                showControl =
+                                                                    false;
+                                                                _dotController
+                                                                    .reverse();
+                                                                return;
+                                                              }
+                                                              toggleControl(
+                                                                  details,
+                                                                  item.id);
+                                                            },
+                                                            child: Icon(
+                                                              CupertinoIcons
+                                                                  .ellipsis,
+                                                              color: kGrey,
+                                                              size: 60.w,
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  ],
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          )),
-                                      index <
-                                              publishController
-                                                      .publishList.length -
-                                                  1
-                                          ? Container(
-                                              width: 1.sw,
-                                              height: 2.w,
-                                              margin: EdgeInsets.symmetric(
-                                                  horizontal: 80.w),
-                                              color: kDevideColor,
-                                            )
-                                          : SizedBox(height: 50.w),
-                                    ],
-                                  );
-                                },
-                                childCount: publishController
-                                    .publishList.length, // 列表项数量
+                                              ],
+                                            )),
+                                        index <
+                                                publishController
+                                                        .publishList.length -
+                                                    1
+                                            ? Container(
+                                                width: 1.sw,
+                                                height: 2.w,
+                                                margin: EdgeInsets.symmetric(
+                                                    horizontal: 80.w),
+                                                color: kDevideColor,
+                                              )
+                                            : SizedBox(height: 50.w),
+                                      ],
+                                    );
+                                  },
+                                  childCount: publishController
+                                      .publishList.length, // 列表项数量
+                                ),
                               ),
                             ),
-                          ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               Positioned(
