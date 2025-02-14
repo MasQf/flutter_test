@@ -25,6 +25,8 @@ class _ChatListPageState extends State<ChatListPage> {
   final SocketService _socketService = SocketService();
   late String _userId;
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +44,7 @@ class _ChatListPageState extends State<ChatListPage> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -50,6 +53,7 @@ class _ChatListPageState extends State<ChatListPage> {
     return StaticTitlePage(
       title: '消息',
       canBack: false,
+      controller: _scrollController,
       sliver: Obx(
         () => SliverList(
           delegate: SliverChildBuilderDelegate(

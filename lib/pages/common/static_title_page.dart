@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -5,7 +6,7 @@ import 'package:test/api/api.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/widgets/head_bar.dart';
 
-class StaticTitlePage extends StatelessWidget {
+class StaticTitlePage extends StatefulWidget {
   final Widget? sliver;
   final String? title;
   final bool? canBack;
@@ -28,37 +29,53 @@ class StaticTitlePage extends StatelessWidget {
   }
 
   @override
+  State<StaticTitlePage> createState() => _StaticTitlePageState();
+}
+
+class _StaticTitlePageState extends State<StaticTitlePage> {
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackColor,
       body: Stack(
         children: [
-          if (background != null)
+          if (widget.background != null)
             Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(
-                    replaceLocalhost(background!),
+                    replaceLocalhost(widget.background!),
                   ),
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-          CustomScrollView(
-            controller: controller,
-            slivers: [
-              SliverPadding(
-                padding: EdgeInsets.only(top: 180.h),
-                sliver: sliver,
-              ),
-            ],
+          CupertinoScrollbar(
+            controller: widget.controller,
+            thickness: 10.w,
+            thicknessWhileDragging: 16.w,
+            radius: Radius.circular(10.r),
+            child: CustomScrollView(
+              controller: widget.controller,
+              slivers: [
+                SliverPadding(
+                  padding: EdgeInsets.only(top: 180.h),
+                  sliver: widget.sliver,
+                ),
+              ],
+            ),
           ),
           Positioned(
             top: 0,
             child: HeadBar(
-              title: title ?? '',
-              canBack: canBack ?? false,
-              pressBack: pressBack,
+              title: widget.title ?? '',
+              canBack: widget.canBack ?? false,
+              pressBack: widget.pressBack,
             ),
           ),
         ],

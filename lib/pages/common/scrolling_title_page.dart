@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,8 +23,16 @@ class ScrollingTitlePage extends StatefulWidget {
 class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
   UserController userController = Get.find<UserController>();
 
+  final ScrollController _scrollController = ScrollController();
+
   double _opacity = 0.0;
   double _scale = 1.0;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,39 +69,48 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
         },
         child: Stack(
           children: [
-            CustomScrollView(slivers: [
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: EdgeInsets.only(top: 0.1.sh),
-                  color: Colors.white,
-                  alignment: Alignment.centerLeft,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Transform.scale(
-                        scale: _scale,
-                        child: Container(
-                          height: 130.w,
-                          margin: EdgeInsets.symmetric(horizontal: 80.w),
-                          child: Text(
-                            widget.title,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 90.sp,
-                              fontWeight: FontWeight.bold,
+            CupertinoScrollbar(
+              controller: _scrollController,
+              thickness: 10.w,
+              thicknessWhileDragging: 16.w,
+              radius: Radius.circular(10.r),
+              child: Container(
+                child:
+                    CustomScrollView(controller: _scrollController, slivers: [
+                  SliverToBoxAdapter(
+                    child: Container(
+                      padding: EdgeInsets.only(top: 0.1.sh),
+                      color: Colors.white,
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Transform.scale(
+                            scale: _scale,
+                            child: Container(
+                              height: 130.w,
+                              margin: EdgeInsets.symmetric(horizontal: 80.w),
+                              child: Text(
+                                widget.title,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 90.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          SizedBox(height: 10.w),
+                          Column(
+                            children: widget.children,
+                          )
+                        ],
                       ),
-                      SizedBox(height: 10.w),
-                      Column(
-                        children: widget.children,
-                      )
-                    ],
+                    ),
                   ),
-                ),
+                ]),
               ),
-            ]),
+            ),
             Positioned(
               top: 0,
               left: 0,

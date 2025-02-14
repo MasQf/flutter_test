@@ -6,6 +6,7 @@ import 'package:test/api/api.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/models/item.dart';
 import 'package:test/pages/photo_view.dart';
+import 'package:test/widgets/expandable_text.dart';
 
 class ItemDetailPage extends StatefulWidget {
   final ItemModel item;
@@ -50,15 +51,16 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                 banner(),
                 Container(
                   width: 1.sw,
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 40.w, vertical: 80.w),
+                  padding: EdgeInsets.symmetric(vertical: 80.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                         width: 0.9.sw,
+                        padding: EdgeInsets.symmetric(horizontal: 80.w),
                         child: Text(
                           item.name,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 80.sp,
                             fontWeight: FontWeight.bold,
@@ -67,15 +69,52 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                         ),
                       ),
                       SizedBox(height: 40.w),
-                      Text(
-                        item.description,
-                        style: TextStyle(
-                          fontSize: 40.sp,
-                          fontWeight: FontWeight.bold,
-                          color: kGrey,
-                          height: 2.5.w,
+                      Container(
+                        padding: EdgeInsets.all(80.w),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFf2f1f6),
                         ),
-                      ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Color(0xFF8c8b90),
+                                    width: 5.w,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                '描述',
+                                style: TextStyle(
+                                  fontSize: 40.sp,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 5.w,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20.h),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(CupertinoIcons.text_quote),
+                                Expanded(
+                                  child: ExpandableText(
+                                    text: item.description,
+                                    style: TextStyle(
+                                      fontSize: 40.sp,
+                                      color: Colors.black,
+                                      height: 2.8.w,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -162,20 +201,4 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       ],
     );
   }
-}
-
-class TrianglePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    var paint = Paint()..color = Colors.white;
-    var path = Path();
-    path.moveTo(0, size.height);
-    path.lineTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height);
-    path.close();
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
