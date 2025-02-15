@@ -56,13 +56,13 @@ class _HeadBarState extends State<HeadBar> {
         ),
         Column(
           children: [
-            SizedBox(height: 90.w),
+            SizedBox(height: 90.h),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(width: 30.w),
                 Container(
-                  height: 80.w,
+                  height: 80.h,
                   child: Center(
                     child: CupertinoButton(
                         padding: EdgeInsets.zero,
@@ -96,7 +96,7 @@ class _HeadBarState extends State<HeadBar> {
                 Row(
                   children: [
                     Container(
-                      height: 80.w,
+                      height: 80.h,
                       child: Center(
                         child: Text(
                           widget.title,

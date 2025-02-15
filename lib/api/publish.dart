@@ -6,7 +6,7 @@ class PublishApi {
   static Future<List<ItemModel>> publishList({required String userId}) async {
     try {
       final response =
-          await Api().post('/items_by_user', data: {"userId": userId});
+          await Api().post('/published_items', data: {"userId": userId});
 
       List<dynamic> itemListJson = response.data['items'];
       List<ItemModel> itemList =

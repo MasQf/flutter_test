@@ -22,6 +22,7 @@ class _ExpandableTextState extends State<ExpandableText> {
   bool isExpanded = false;
   late String displayText; // 要展示的文本
   bool isOverflow = false; // 是否超出 maxLines 限制
+  double opacity = 0.0; // 控制隐藏文字的透明度
 
   @override
   void initState() {
@@ -83,31 +84,44 @@ class _ExpandableTextState extends State<ExpandableText> {
     return truncatedText;
   }
 
+  /// **展开文本**
+  void _expandText() {
+    setState(() {
+      isExpanded = true;
+    });
+    // 开始透明度动画
+    Future.delayed(Duration.zero, () {
+      setState(() {
+        opacity = 1.0;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        text: isExpanded ? widget.text : displayText,
-        style: widget.style,
-        children: (!isExpanded && isOverflow) // 只在未展开且超出时显示 "更多"
-            ? [
-                TextSpan(
-                  text: "...更多",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: widget.style.fontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      setState(() {
-                        isExpanded = true;
-                      });
-                    },
-                ),
-              ]
-            : [],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RichText(
+          text: TextSpan(
+            text: isExpanded ? widget.text : displayText,
+            style: widget.style,
+            children: (!isExpanded && isOverflow) // 只在未展开且超出时显示 "更多"
+                ? [
+                    TextSpan(
+                      text: "...更多",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: widget.style.fontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      recognizer: TapGestureRecognizer()..onTap = _expandText,
+                    ),
+                  ]
+                : [],
+          ),
+        ),
+      ],
     );
   }
 }

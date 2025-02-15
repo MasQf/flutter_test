@@ -185,7 +185,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           SizedBox(height: 40.w),
           // 内容
           Container(
-            height: 0.54.sh,
+            height: 0.56.sh,
             child: PageView.builder(
                 controller: _rankingPageController,
                 itemCount: 2,
