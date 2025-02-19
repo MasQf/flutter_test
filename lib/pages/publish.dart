@@ -168,7 +168,7 @@ class _PublishPageState extends State<PublishPage>
     };
   }
 
-  Color getCategoryColor(String category) {
+  Color _getCategoryColor(String category) {
     if (category == "闲置物品") {
       return Color(0xFF1b4588); // 蓝色
     } else if (category == "组织活动") {
@@ -176,7 +176,7 @@ class _PublishPageState extends State<PublishPage>
     } else if (category == "校园跑腿") {
       return Colors.black; // 黑色
     } else {
-      return Colors.grey; // 默认颜色
+      return kGrey; // 默认颜色
     }
   }
 
@@ -692,7 +692,7 @@ class _PublishPageState extends State<PublishPage>
                                                                           5.w),
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: getCategoryColor(
+                                                                    color: _getCategoryColor(
                                                                         item.category),
                                                                     borderRadius:
                                                                         BorderRadius.circular(
@@ -828,19 +828,27 @@ class _PublishPageState extends State<PublishPage>
                 right: 0,
                 child: Stack(
                   children: [
-                    Positioned(
-                      child: ClipRect(
-                        // ClipRect 限制模糊范围
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                          child: Container(
-                            height: 180.h,
-                            width: 1.sw,
-                            color: Colors.white.withOpacity(0.7), // 半透明背景
+                    if (_opacity == 1)
+                      Positioned(
+                        child: ClipRect(
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                            child: Container(
+                              height: 180.h,
+                              width: 1.sw,
+                              color: Colors.white.withOpacity(0.7),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    if (_opacity != 1)
+                      Positioned(
+                        child: Container(
+                          height: 180.h,
+                          width: 1.sw,
+                          color: Colors.white,
+                        ),
+                      ),
                     Container(
                       height: 180.h,
                       width: 1.sw,
@@ -854,7 +862,7 @@ class _PublishPageState extends State<PublishPage>
                       ),
                       child: Column(
                         children: [
-                          SizedBox(height: 100.w),
+                          SizedBox(height: 90.h),
                           AnimatedOpacity(
                             opacity: _opacity,
                             duration: Duration(milliseconds: 200),

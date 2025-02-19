@@ -241,7 +241,7 @@ class _PersonalPageState extends State<PersonalPage> {
                               style: TextStyle(
                                 fontSize: 55.sp,
                                 fontWeight: FontWeight.bold,
-                                color: kMainColor,
+                                color: kBlue,
                               ),
                             ),
                           ),
@@ -275,7 +275,7 @@ class _PersonalPageState extends State<PersonalPage> {
                               style: TextStyle(
                                 fontSize: 55.sp,
                                 fontWeight: FontWeight.bold,
-                                color: kMainColor,
+                                color: kBlue,
                               ),
                             ),
                           ),
@@ -327,7 +327,7 @@ class _PersonalPageState extends State<PersonalPage> {
                                 style: TextStyle(
                                   fontSize: 55.sp,
                                   fontWeight: FontWeight.bold,
-                                  color: kMainColor,
+                                  color: kBlue,
                                 ),
                               ),
                             ),
@@ -351,7 +351,7 @@ class _PersonalPageState extends State<PersonalPage> {
                               style: TextStyle(
                                 fontSize: 55.sp,
                                 fontWeight: FontWeight.bold,
-                                color: kMainColor,
+                                color: kBlue,
                               ),
                             ),
                           ),

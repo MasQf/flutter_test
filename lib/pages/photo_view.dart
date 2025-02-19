@@ -95,7 +95,7 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
                   )),
             Positioned(
               right: 50.w,
-              top: 50.w,
+              top: 85.h,
               child: Container(
                 width: 90.w,
                 height: 90.w,

@@ -7,7 +7,7 @@ import 'package:test/pages/splash.dart';
 class MyScrollBehavior extends ScrollBehavior {
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) {
-    return BouncingScrollPhysics(); // 去掉弹性
+    return BouncingScrollPhysics(); // 苹果滚动风格
   }
 }
 

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -185,7 +183,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           SizedBox(height: 40.w),
           // 内容
           Container(
-            height: 0.56.sh,
+            height: 0.54.sh,
             child: PageView.builder(
                 controller: _rankingPageController,
                 itemCount: 2,
@@ -491,6 +489,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         );
                       }
                   }
+                  return null;
                 }),
           ),
         ],

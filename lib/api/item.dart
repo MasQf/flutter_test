@@ -18,9 +18,13 @@ class ItemApi {
   }
 
   /// 最近发布列表
-  static Future<List<ItemModel>> latestList() async {
+  static Future<List<ItemModel>> latestList(
+      {int page = 1, int size = 10}) async {
     try {
-      final response = await Api().get('/latest_items');
+      final response = await Api().post('/latest_items', data: {
+        'page': page,
+        'size': size,
+      });
 
       List<dynamic> itemListJson = response.data['items'];
       List<ItemModel> itemList =
@@ -42,6 +46,36 @@ class ItemApi {
       return data;
     } catch (e) {
       throw Exception("Error get ranking list: $e");
+    }
+  }
+
+  // 收藏
+  static Future<bool> favorite({required String itemId}) async {
+    try {
+      final response = await Api().post('/favorite', data: {
+        'itemId': itemId,
+      });
+
+      bool status = response.data['status'];
+
+      return status;
+    } catch (e) {
+      throw Exception("Error favorite: $e");
+    }
+  }
+
+  // 取消收藏
+  static Future<bool> unFavorite({required String itemId}) async {
+    try {
+      final response = await Api().post('/unFavorite', data: {
+        'itemId': itemId,
+      });
+
+      bool status = response.data['status'];
+
+      return status;
+    } catch (e) {
+      throw Exception("Error unFavorite: $e");
     }
   }
 

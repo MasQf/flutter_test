@@ -13,6 +13,7 @@ class StaticTitlePage extends StatefulWidget {
   final void Function() pressBack;
   final ScrollController? controller;
   final String? background;
+  final bool isReverse;
 
   const StaticTitlePage({
     super.key,
@@ -22,6 +23,7 @@ class StaticTitlePage extends StatefulWidget {
     this.pressBack = _defaultPressBack,
     this.controller,
     this.background,
+    this.isReverse = false,
   });
 
   static void _defaultPressBack() {
@@ -46,6 +48,8 @@ class _StaticTitlePageState extends State<StaticTitlePage> {
         children: [
           if (widget.background != null)
             Container(
+              width: 1.sw,
+              height: 1.sh,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(
@@ -62,6 +66,7 @@ class _StaticTitlePageState extends State<StaticTitlePage> {
             radius: Radius.circular(10.r),
             child: CustomScrollView(
               controller: widget.controller,
+              reverse: widget.isReverse,
               slivers: [
                 SliverPadding(
                   padding: EdgeInsets.only(top: 180.h),

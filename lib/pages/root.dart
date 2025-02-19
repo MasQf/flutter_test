@@ -55,7 +55,6 @@ class _RootPageState extends State<RootPage> {
           children: [
             Positioned.fill(
               child: ClipRect(
-                // ClipRect 限制模糊范围
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
                   child: Container(
@@ -161,7 +160,7 @@ class _RootPageState extends State<RootPage> {
                             color: _pageIndex == 3 ? kMainColor : kIconGrey,
                           ),
                           Text(
-                            '我的',
+                            '个人',
                             style: TextStyle(
                                 fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,

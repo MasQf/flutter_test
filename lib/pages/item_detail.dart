@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,9 @@ import 'package:get/get.dart';
 import 'package:test/api/api.dart';
 import 'package:test/api/item.dart';
 import 'package:test/constants/color.dart';
+import 'package:test/controllers/user.dart';
 import 'package:test/models/item.dart';
+import 'package:test/pages/chat_detail.dart';
 import 'package:test/pages/photo_view.dart';
 import 'package:test/widgets/expandable_text.dart';
 
@@ -24,8 +27,11 @@ class ItemDetailPage extends StatefulWidget {
 }
 
 class _ItemDetailPageState extends State<ItemDetailPage> {
+  final UserController userController = Get.find<UserController>();
   final double imageHeight = 0.7.sh;
   late ItemModel item;
+
+  final ScrollController _scrollController = ScrollController();
 
   Future<void> _loadItem() async {
     item = await ItemApi.item(itemId: widget.item.id);
@@ -38,6 +44,9 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
   // late PageController _commentController;
   // int _commentIndex = 0;
 
+  final GlobalKey deviderKey = GlobalKey();
+  double topHeight = 0;
+
   @override
   void initState() {
     super.initState();
@@ -47,13 +56,144 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     // _commentController = PageController(initialPage: 0);
     ItemApi.view(itemId: item.id); // 浏览数+1
     _loadItem();
+    _scrollController.addListener(_checkIfContainerReachesTop);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_checkIfContainerReachesTop);
+    _scrollController.dispose();
     _bannerController.dispose();
     // _commentController.dispose();
     super.dispose();
+  }
+
+  void _checkIfContainerReachesTop() {
+    // 获取 devider 的渲染对象
+    final RenderBox? renderBox =
+        deviderKey.currentContext?.findRenderObject() as RenderBox;
+    if (renderBox == null) return;
+
+    // 获取 devider 在屏幕中的位置
+    final Offset containerPosition = renderBox.localToGlobal(Offset.zero);
+
+    // // 获取 devider 的高度
+    // final double containerHeight = renderBox.size.height;
+
+    // 判断 devider 是否触碰到了屏幕顶部
+    if (containerPosition.dy <= 0) {
+      setState(() {
+        topHeight = 200.h;
+      });
+    } else {
+      setState(() {
+        topHeight = 0;
+      });
+    }
+  }
+
+  void _showFavoriteDialog(BuildContext context, {bool isFavorite = true}) {
+    // 创建一个OverlayEntry
+    OverlayEntry? overlayEntry;
+
+    // 透明度状态
+    double opacity = 0.0;
+
+    // 更新透明度并触发重建
+    void updateOpacity(double newOpacity) {
+      opacity = newOpacity;
+      overlayEntry?.markNeedsBuild(); // 强制重建OverlayEntry
+    }
+
+    overlayEntry = OverlayEntry(
+      builder: (context) => IgnorePointer(
+        ignoring: true,
+        child: Material(
+          color: Colors.transparent,
+          child: Center(
+            child: Stack(
+              children: [
+                AnimatedOpacity(
+                  opacity: opacity, // 动态透明度
+                  duration: Duration(milliseconds: 200),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(40.r),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                      child: Container(
+                        width: ((1080 - 160) / 1080).sw - 80.w,
+                        height: 0.4.sh,
+                        color: Colors.white.withOpacity(0.7), // 半透明背景
+                      ),
+                    ),
+                  ),
+                ),
+                AnimatedOpacity(
+                  opacity: opacity, // 动态透明度
+                  duration: Duration(milliseconds: 200),
+                  child: Container(
+                    width: ((1080 - 160) / 1080).sw - 80.w,
+                    height: 0.45.sh,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(40.r),
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 80.h),
+                        Icon(
+                          isFavorite
+                              ? CupertinoIcons.text_badge_checkmark
+                              : CupertinoIcons.text_badge_minus,
+                          color: Color(0xFF555555),
+                          size: 300.w,
+                        ),
+                        SizedBox(height: 130.h),
+                        Text(
+                          isFavorite ? '已收藏' : '已移除',
+                          style: TextStyle(
+                            fontSize: 60.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                        SizedBox(height: 30.h),
+                        Text(
+                          isFavorite ? '已收藏至“个人”的“收藏列表”中。' : '已从“收藏列表”移除。',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 40.sp,
+                            color: Colors.black,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // 插入OverlayEntry
+    Overlay.of(context).insert(overlayEntry);
+
+    Future.delayed(Duration(milliseconds: 10), () {
+      updateOpacity(1.0);
+    });
+
+    // 开始透明度动画
+    Future.delayed(Duration(milliseconds: 2500), () {
+      updateOpacity(0.0);
+
+      // 等待动画完成后移除OverlayEntry
+      Future.delayed(Duration(milliseconds: 500), () {
+        overlayEntry?.remove();
+      });
+    });
   }
 
   @override
@@ -62,158 +202,157 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                banner(), // 轮播图
-                Container(
-                  width: 1.sw,
-                  padding: EdgeInsets.symmetric(vertical: 80.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 80.w),
-                        child: Column(
-                          children: [
-                            Text(
-                              item.name,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 80.sp,
-                                fontWeight: FontWeight.bold,
-                                height: 1.3,
-                              ),
-                            ),
-                            SizedBox(height: 30.h),
-                            CupertinoButton(
-                              onPressed: () {},
-                              padding: EdgeInsets.zero,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 90.w,
-                                    height: 90.w,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                          replaceLocalhost(item.owner.avatar),
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 20.w),
-                                  Text(
-                                    '${item.owner.name}',
-                                    style: TextStyle(
-                                      fontSize: 50.sp,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  Icon(
-                                    CupertinoIcons.chevron_forward,
-                                    color: kArrowGrey,
-                                    size: 50.w,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 50.h),
-                            //
-                            CupertinoButton(
-                              onPressed: () {},
-                              padding: EdgeInsets.zero,
-                              child: Container(
-                                width: 1.sw,
-                                padding: EdgeInsets.symmetric(vertical: 30.h),
-                                decoration: BoxDecoration(
-                                  color: kMainColor,
-                                  border: Border.all(
-                                    color: kMainColor,
-                                    width: 5.w,
-                                  ),
-                                  borderRadius: BorderRadius.circular(200.r),
+          CupertinoScrollbar(
+            controller: _scrollController,
+            thickness: 10.w,
+            thicknessWhileDragging: 16.w,
+            radius: Radius.circular(10.r),
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                children: [
+                  banner(), // 轮播图
+                  Container(
+                    width: 1.sw,
+                    padding: EdgeInsets.symmetric(vertical: 80.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 80.w),
+                          child: Column(
+                            children: [
+                              Text(
+                                item.name,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 80.sp,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.3,
                                 ),
+                              ),
+                              SizedBox(height: 30.h),
+                              CupertinoButton(
+                                onPressed: () {
+                                  //
+                                },
+                                padding: EdgeInsets.zero,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
+                                    item.owner.avatar != ''
+                                        ? Container(
+                                            width: 90.w,
+                                            height: 90.w,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                  replaceLocalhost(
+                                                      item.owner.avatar),
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          )
+                                        : Container(
+                                            width: 90.w,
+                                            height: 90.w,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: kDevideColor,
+                                            ),
+                                            child: Center(
+                                              child: Icon(
+                                                CupertinoIcons.person_fill,
+                                                size: 60.w,
+                                                color: kGrey,
+                                              ),
+                                            ),
+                                          ),
+                                    SizedBox(width: 20.w),
                                     Text(
-                                      '购买',
+                                      '${item.owner.name}',
                                       style: TextStyle(
-                                        fontSize: 45.sp,
-                                        color: Colors.white,
+                                        fontSize: 50.sp,
+                                        color: Colors.black,
                                       ),
                                     ),
-                                    SizedBox(width: 20.w),
-                                    Container(
-                                      width: 4.w,
-                                      height: 50.h,
-                                      color: Colors.white,
-                                    ),
-                                    SizedBox(width: 20.w),
-                                    Text(
-                                      'RMB￥${item.price}',
-                                      style: TextStyle(
-                                        fontSize: 45.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
+                                    Icon(
+                                      CupertinoIcons.chevron_forward,
+                                      color: kArrowGrey,
+                                      size: 50.w,
                                     ),
                                   ],
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 30.w),
-                            Row(
-                              children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: CupertinoButton(
-                                    onPressed: () {},
-                                    padding: EdgeInsets.zero,
-                                    child: Container(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 30.h),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        border: Border.all(
-                                          color: kMainColor,
-                                          width: 5.w,
-                                        ),
-                                        borderRadius:
-                                            BorderRadius.circular(200.r),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            CupertinoIcons.plus_circle_fill,
-                                            size: 50.w,
-                                            color: kMainColor,
-                                          ),
-                                          SizedBox(width: 10.w),
-                                          Text(
-                                            '收藏',
-                                            style: TextStyle(
-                                              fontSize: 45.sp,
-                                              color: kMainColor,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                              SizedBox(height: 50.h),
+                              //
+                              CupertinoButton(
+                                onPressed: () {},
+                                padding: EdgeInsets.zero,
+                                child: Container(
+                                  width: 1.sw,
+                                  padding: EdgeInsets.symmetric(vertical: 30.h),
+                                  decoration: BoxDecoration(
+                                    color: kMainColor,
+                                    border: Border.all(
+                                      color: kMainColor,
+                                      width: 5.w,
                                     ),
+                                    borderRadius: BorderRadius.circular(200.r),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '购买',
+                                        style: TextStyle(
+                                          fontSize: 45.sp,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(width: 20.w),
+                                      Container(
+                                        width: 4.w,
+                                        height: 50.h,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(width: 20.w),
+                                      Text(
+                                        'RMB￥${item.price}',
+                                        style: TextStyle(
+                                          fontSize: 45.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                if (item.isNegotiable) SizedBox(width: 30.w),
-                                if (item.isNegotiable)
+                              ),
+                              SizedBox(height: 30.w),
+                              Row(
+                                children: [
                                   Expanded(
-                                    flex: 1,
+                                    flex: 2,
                                     child: CupertinoButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        if (!item.isFavorite) {
+                                          _showFavoriteDialog(context);
+                                          setState(() {
+                                            item.isFavorite = true;
+                                          });
+                                          ItemApi.favorite(itemId: item.id);
+                                        } else {
+                                          _showFavoriteDialog(context,
+                                              isFavorite: false);
+                                          setState(() {
+                                            item.isFavorite = false;
+                                          });
+                                          ItemApi.unFavorite(itemId: item.id);
+                                        }
+                                      },
                                       padding: EdgeInsets.zero,
                                       child: Container(
                                         padding: EdgeInsets.symmetric(
@@ -232,14 +371,17 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Icon(
-                                              CupertinoIcons
-                                                  .ellipses_bubble_fill,
+                                              item.isFavorite
+                                                  ? CupertinoIcons
+                                                      .checkmark_circle_fill
+                                                  : CupertinoIcons
+                                                      .plus_circle_fill,
                                               size: 50.w,
                                               color: kMainColor,
                                             ),
                                             SizedBox(width: 10.w),
                                             Text(
-                                              '议价',
+                                              item.isFavorite ? '已收藏' : '收藏',
                                               style: TextStyle(
                                                 fontSize: 45.sp,
                                                 color: kMainColor,
@@ -250,46 +392,186 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                       ),
                                     ),
                                   ),
-                              ],
+                                  if (item.isNegotiable) SizedBox(width: 30.w),
+                                  if (item.isNegotiable)
+                                    Expanded(
+                                      flex: 1,
+                                      child: CupertinoButton(
+                                        onPressed: () {
+                                          Get.to(
+                                            () => ChatDetailPage(
+                                              senderId: userController.id.value,
+                                              receiverId: item.owner.id,
+                                              targetName: item.owner.name,
+                                              targetAvatar: item.owner.avatar,
+                                            ),
+                                            transition: Transition.cupertino,
+                                          );
+                                        },
+                                        padding: EdgeInsets.zero,
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 30.h),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            border: Border.all(
+                                              color: kMainColor,
+                                              width: 5.w,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(200.r),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                CupertinoIcons
+                                                    .ellipses_bubble_fill,
+                                                size: 50.w,
+                                                color: kMainColor,
+                                              ),
+                                              SizedBox(width: 10.w),
+                                              Text(
+                                                '议价',
+                                                style: TextStyle(
+                                                  fontSize: 45.sp,
+                                                  color: kMainColor,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 80.w),
+                        Container(
+                          key: deviderKey,
+                          width: 1.sw,
+                          height: 2.w,
+                          margin: EdgeInsets.symmetric(horizontal: 80.w),
+                          color: kDevideColor,
+                        ),
+                        SizedBox(height: 80.w),
+                        description(), // 描述
+                        SizedBox(height: 80.w),
+                        info(), // 信息
+                        SizedBox(height: 80.w),
+                        Container(
+                          width: 1.sw,
+                          height: 2.w,
+                          margin: EdgeInsets.symmetric(horizontal: 80.w),
+                          color: kDevideColor,
+                        ),
+                        // comment(), // 用户留言
+                        SizedBox(height: 80.w),
+                        Container(
+                          width: 1.sw,
+                          height: 2.w,
+                          margin: EdgeInsets.symmetric(horizontal: 80.w),
+                          color: kDevideColor,
+                        ),
+                        SizedBox(height: 1000.h),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // 顶部价格
+          Positioned(
+            top: 0,
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 100),
+              height: topHeight,
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: kDevideColor, width: 2.w),
+                ),
+              ),
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                  child: Container(
+                    height: 180.h,
+                    width: 1.sw,
+                    color: Colors.white.withOpacity(0.7),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            child: AnimatedContainer(
+                duration: Duration(milliseconds: 100),
+                height: topHeight,
+                padding: EdgeInsets.fromLTRB(40.w, 0, 40.w, 20.h),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: kDevideColor, width: 2.w),
+                  ),
+                ),
+                child: Container(
+                  child: Row(
+                    children: [
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: CupertinoButton(
+                          onPressed: () {},
+                          padding: EdgeInsets.zero,
+                          child: Container(
+                            constraints: BoxConstraints(maxWidth: 0.4.sw),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 40.w, vertical: 10.h),
+                            decoration: BoxDecoration(
+                              color: kMainColor,
+                              borderRadius: BorderRadius.circular(200.r),
                             ),
-                            SizedBox(height: 80.w),
-                            Container(
-                              width: 1.sw,
-                              height: 2.w,
-                              color: kDevideColor,
-                            )
-                          ],
+                            child: Text(
+                              'RMB￥${item.price}',
+                              style: TextStyle(
+                                fontSize: 45.sp,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      SizedBox(height: 80.w),
-                      description(), // 描述
-                      SizedBox(height: 80.w),
-                      info(), // 信息
-                      SizedBox(height: 80.w),
-                      Container(
-                        width: 1.sw,
-                        height: 2.w,
-                        margin: EdgeInsets.symmetric(horizontal: 80.w),
-                        color: kDevideColor,
-                      ),
-                      // comment(), // 用户留言
-                      SizedBox(height: 80.w),
-                      Container(
-                        width: 1.sw,
-                        height: 2.w,
-                        margin: EdgeInsets.symmetric(horizontal: 80.w),
-                        color: kDevideColor,
+                      SizedBox(width: 20.w),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          constraints: BoxConstraints(maxWidth: 0.45.sw),
+                          padding: EdgeInsets.symmetric(vertical: 10.h),
+                          child: Text(
+                            '${item.name}',
+                            style: TextStyle(
+                              fontSize: 45.sp,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
+                )),
           ),
           // 关闭按钮
           Positioned(
             right: 50.w,
-            top: 50.w,
+            top: 85.h,
             child: Container(
               width: 90.w,
               height: 90.w,
@@ -656,7 +938,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

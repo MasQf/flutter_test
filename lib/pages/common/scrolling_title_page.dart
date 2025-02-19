@@ -117,18 +117,27 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
               right: 0,
               child: Stack(
                 children: [
-                  Positioned(
-                    child: ClipRect(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          height: 180.h,
-                          width: 1.sw,
-                          color: Colors.white.withOpacity(0.7),
+                  if (_opacity == 1)
+                    Positioned(
+                      child: ClipRect(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                          child: Container(
+                            height: 180.h,
+                            width: 1.sw,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  if (_opacity != 1)
+                    Positioned(
+                      child: Container(
+                        height: 180.h,
+                        width: 1.sw,
+                        color: Colors.white,
+                      ),
+                    ),
                   Container(
                     height: 180.h,
                     width: 1.sw,
@@ -142,14 +151,17 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
                     ),
                     child: Column(
                       children: [
-                        SizedBox(height: 100.w),
+                        SizedBox(height: 90.h),
                         AnimatedOpacity(
                           opacity: _opacity,
                           duration: Duration(milliseconds: 200),
                           curve: Curves.easeInOut,
-                          child: Text(
-                            widget.title,
-                            style: kPageTitle,
+                          child: Container(
+                            height: 80.h,
+                            child: Text(
+                              widget.title,
+                              style: kPageTitle,
+                            ),
                           ),
                         ),
                       ],

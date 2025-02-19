@@ -54,14 +54,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       final newDetailList = await ChatApi.detail(roomId: roomId);
       if (mounted) {
         setState(() {
-          _messages.assignAll(newDetailList);
+          _messages.assignAll(newDetailList.reversed.toList());
           isLoading = false;
-          if (!isLoading) {
-            // 延迟执行滚动
-            Future.delayed(Duration(milliseconds: 300), () {
-              _scrollToBottom(0);
-            });
-          }
         });
       }
     } catch (e) {
@@ -93,18 +87,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       MessageModel msg = MessageModel.fromJson(message);
       if (mounted) {
         setState(() {
-          _messages.add(msg);
+          _messages.insert(0, msg);
         });
-        Future.delayed(Duration(milliseconds: 300), () {
-          _scrollToBottom(0);
-        });
-      }
-    });
-
-    // 监听焦点变化
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        _scrollToBottom(800);
       }
     });
   }
@@ -133,22 +117,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     if (content.isNotEmpty && mounted) {
       _socketService.sendMessage(msg);
       _messageController.clear();
-      Future.delayed(Duration(milliseconds: 100), () {
-        _scrollToBottom(0);
-      });
-    }
-  }
-
-  // 滚动到底部的方法
-  void _scrollToBottom(double height) {
-    // Scroll to the bottom of the chat list when a new message is added
-    if (_scrollController.hasClients) {
-      print("Scrolling to bottom");
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent + height.h,
-        duration: Duration(milliseconds: 100),
-        curve: Curves.easeOut,
-      );
     }
   }
 
@@ -362,11 +330,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                           topRight: Radius.circular(30.r),
                         ),
                         child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
                           child: Container(
                             width: 1.sw,
                             height: 130.w,
-                            color: Colors.white.withOpacity(0.7), // 半透明背景
+                            color: Colors.white.withOpacity(0.7),
                           ),
                         ),
                       ),
@@ -454,6 +422,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     Get.back();
                   },
                   background: userController.background.value,
+                  isReverse: true,
                   // 加载
                   // SliverToBoxAdapter(
                   //     child: Column(
@@ -476,10 +445,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                             ? Container(
                                 width: 1.sw,
                                 margin: EdgeInsets.only(
-                                    bottom: index == _messages.length - 1
-                                        ? lastMarginHeight
-                                        : 40.w,
-                                    top: index == 0 ? 30.w : 0),
+                                    bottom: 40.h,
+                                    top: index == _messages.length - 1
+                                        ? 40.h
+                                        : 0),
                                 padding: EdgeInsets.symmetric(horizontal: 30.w),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -532,10 +501,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                             : Container(
                                 width: 1.sw,
                                 margin: EdgeInsets.only(
-                                    bottom: index == _messages.length - 1
-                                        ? lastMarginHeight
-                                        : 40.w,
-                                    top: index == 0 ? 30.w : 0),
+                                    bottom: 40.h,
+                                    top: index == _messages.length - 1
+                                        ? 40.h
+                                        : 0),
                                 padding: EdgeInsets.symmetric(horizontal: 30.w),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -595,13 +564,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 child: Stack(children: [
                   Positioned.fill(
                     child: ClipRect(
-                      // ClipRect 限制模糊范围
                       child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
                         child: Container(
                           height: 200.h,
                           width: 1.sw,
-                          color: Colors.white.withOpacity(0.7), // 半透明背景
+                          color: Colors.white.withOpacity(0.7),
                         ),
                       ),
                     ),
@@ -673,191 +641,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ),
             ],
           ),
-          // Positioned(
-          //   bottom: 0,
-          //   child: Container(
-          //     width: 1.sw,
-          //     height: 0.85.sh,
-          //     decoration: BoxDecoration(
-          //       color: kBackColor,
-          //       borderRadius: BorderRadius.circular(30.r),
-          //       boxShadow: [
-          //         BoxShadow(
-          //           color: Colors.black.withOpacity(0.05),
-          //           blurRadius: 20,
-          //           offset: Offset(0, -3),
-          //         )
-          //       ],
-          //     ),
-          //     child: Stack(
-          //       children: [
-          //         SingleChildScrollView(
-          //           child: Container(
-          //             width: 1.sw,
-          //             padding: EdgeInsets.only(top: 200.w),
-          //             child: Column(
-          //               children: [
-          //                 CupertinoButton(
-          //                   padding: EdgeInsets.zero,
-          //                   onPressed: () {
-          //                     if (widget.targetAvatar != '') {
-          //                       Get.to(
-          //                         () => PhotoViewPage(
-          //                           images: [widget.targetAvatar],
-          //                           initialIndex: 0,
-          //                           hasPage: false,
-          //                         ),
-          //                       );
-          //                     }
-          //                   },
-          //                   child: Container(
-          //                     width: 230.w,
-          //                     height: 230.w,
-          //                     decoration: BoxDecoration(
-          //                       color: Colors.white,
-          //                       shape: BoxShape.circle,
-          //                       image: widget.targetAvatar != ''
-          //                           ? DecorationImage(
-          //                               image:
-          //                                   CachedNetworkImageProvider(widget.targetAvatar),
-          //                               fit: BoxFit.cover,
-          //                             )
-          //                           : null,
-          //                     ),
-          //                     child: widget.targetAvatar != ''
-          //                         ? null
-          //                         : Center(
-          //                             child: Icon(
-          //                               CupertinoIcons.person_fill,
-          //                               size: 190.w,
-          //                               color: kGrey,
-          //                             ),
-          //                           ),
-          //                   ),
-          //                 ),
-          //                 SizedBox(height: 30.w),
-          //                 Text(
-          //                   widget.targetName,
-          //                   style: TextStyle(
-          //                     fontSize: 60.sp,
-          //                     fontWeight: FontWeight.bold,
-          //                     color: Colors.black,
-          //                   ),
-          //                 ),
-          //                 SizedBox(height: 50.w),
-          //                 Container(
-          //                   margin: EdgeInsets.symmetric(horizontal: 40.w),
-          //                   decoration: BoxDecoration(
-          //                     color: Colors.white,
-          //                     borderRadius: BorderRadius.circular(30.r),
-          //                   ),
-          //                   child: Column(
-          //                     children: [
-          //                       infoButton(
-          //                         borderRadius: BorderRadius.only(
-          //                           topLeft: Radius.circular(30.r),
-          //                           topRight: Radius.circular(30.r),
-          //                         ),
-          //                         onPressed: () {},
-          //                         title: '已发布',
-          //                       ),
-          //                       infoButton(
-          //                         onPressed: () {},
-          //                         title: '发布',
-          //                       ),
-          //                       infoButton(
-          //                         borderRadius: BorderRadius.only(
-          //                           bottomLeft: Radius.circular(30.r),
-          //                           bottomRight: Radius.circular(30.r),
-          //                         ),
-          //                         onPressed: () {},
-          //                         title: '发布',
-          //                       ),
-          //                     ],
-          //                   ),
-          //                 ),
-          //               ],
-          //             ),
-          //           ),
-          //         ),
-          //         Container(
-          //           width: 1.sw,
-          //           height: 130.w,
-          //           child: Stack(
-          //             children: [
-          //               Positioned(
-          //                 child: ClipRRect(
-          //                   borderRadius: BorderRadius.only(
-          //                     topLeft: Radius.circular(30.r),
-          //                     topRight: Radius.circular(30.r),
-          //                   ),
-          //                   child: BackdropFilter(
-          //                     filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-          //                     child: Container(
-          //                       width: 1.sw,
-          //                       height: 130.w,
-          //                       color: Colors.white.withOpacity(0.7), // 半透明背景
-          //                     ),
-          //                   ),
-          //                 ),
-          //               ),
-          //               ClipRRect(
-          //                 borderRadius: BorderRadius.only(
-          //                   topLeft: Radius.circular(30.r),
-          //                   topRight: Radius.circular(30.r),
-          //                 ),
-          //                 child: Container(
-          //                   padding: EdgeInsets.symmetric(
-          //                       horizontal: 40.w, vertical: 30.w),
-          //                   child: Row(
-          //                     children: [
-          //                       CupertinoButton(
-          //                         padding: EdgeInsets.zero,
-          //                         onPressed: () {},
-          //                         child: Text(
-          //                           '完成',
-          //                           style: TextStyle(
-          //                             fontSize: 45.sp,
-          //                             fontWeight: FontWeight.bold,
-          //                             color: Colors.transparent,
-          //                           ),
-          //                         ),
-          //                       ),
-          //                       Spacer(),
-          //                       Text(
-          //                         '个人信息',
-          //                         style: TextStyle(
-          //                           fontSize: 45.sp,
-          //                           fontWeight: FontWeight.bold,
-          //                           color: Colors.black,
-          //                         ),
-          //                       ),
-          //                       Spacer(),
-          //                       CupertinoButton(
-          //                         padding: EdgeInsets.zero,
-          //                         onPressed: () {
-          //                           Get.back();
-          //                         },
-          //                         child: Text(
-          //                           '完成',
-          //                           style: TextStyle(
-          //                             fontSize: 45.sp,
-          //                             fontWeight: FontWeight.bold,
-          //                             color: kMainColor,
-          //                           ),
-          //                         ),
-          //                       ),
-          //                     ],
-          //                   ),
-          //                 ),
-          //               ),
-          //             ],
-          //           ),
-          //         )
-          //       ],
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );

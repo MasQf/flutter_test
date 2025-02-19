@@ -32,15 +32,15 @@ class _BargainSliderState extends State<BargainSlider> {
 
   bool isDragging = false; // 添加拖动状态
 
-  // 检查是否在可拖动区域内（包括横线和圆形）
-  bool _isInDraggableArea(Offset position, Size size) {
-    // 圆形中心点
-    final circleCenter = Offset(-(size.width * 5), _sliderPosition + 50.h);
-    // 计算触摸点到圆心的距离
-    final distance = (position - circleCenter).distance;
-    // 如果在圆形范围内或者在横线上
-    return distance <= 30.w || (position.dy >= _sliderPosition + 45.h && position.dy <= _sliderPosition + 55.h);
-  }
+  // // 检查是否在可拖动区域内（包括横线和圆形）
+  // bool _isInDraggableArea(Offset position, Size size) {
+  //   // 圆形中心点
+  //   final circleCenter = Offset(-(size.width * 5), _sliderPosition + 50.h);
+  //   // 计算触摸点到圆心的距离
+  //   final distance = (position - circleCenter).distance;
+  //   // 如果在圆形范围内或者在横线上
+  //   return distance <= 30.w || (position.dy >= _sliderPosition + 45.h && position.dy <= _sliderPosition + 55.h);
+  // }
 
   @override
   void initState() {
@@ -56,7 +56,8 @@ class _BargainSliderState extends State<BargainSlider> {
   // }
 
   double _positionToPrice(double position) {
-    return widget.maxPrice - (position / sliderHeight) * (widget.maxPrice - widget.minPrice);
+    return widget.maxPrice -
+        (position / sliderHeight) * (widget.maxPrice - widget.minPrice);
   }
 
   @override
@@ -64,7 +65,8 @@ class _BargainSliderState extends State<BargainSlider> {
     return GestureDetector(
       onVerticalDragUpdate: (details) {
         setState(() {
-          _sliderPosition = (_sliderPosition + details.delta.dy).clamp(0, sliderHeight);
+          _sliderPosition =
+              (_sliderPosition + details.delta.dy).clamp(0, sliderHeight);
           _currentPrice = _positionToPrice(_sliderPosition);
           widget.onPriceChanged(_currentPrice);
         });
@@ -326,7 +328,8 @@ class BargainPainter extends CustomPainter {
         text: priceText,
         style: TextStyle(
           fontFamily: 'KaushanScript',
-          color: currentPrice.toStringAsFixed(2) == (maxPrice - (maxPrice - minPrice) * 0.2).toStringAsFixed(2)
+          color: currentPrice.toStringAsFixed(2) ==
+                  (maxPrice - (maxPrice - minPrice) * 0.2).toStringAsFixed(2)
               ? Colors.amber
               : Colors.white,
           fontSize: 45.sp,

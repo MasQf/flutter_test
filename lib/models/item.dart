@@ -15,6 +15,7 @@ class ItemModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final UserModel owner;
+  bool isFavorite;
 
   ItemModel({
     required this.id,
@@ -31,6 +32,7 @@ class ItemModel {
     required this.createdAt,
     required this.updatedAt,
     required this.owner,
+    this.isFavorite = false,
   });
 
   factory ItemModel.fromJson(Map<String, dynamic> json) {
@@ -49,6 +51,7 @@ class ItemModel {
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
       owner: UserModel.fromJson(json['owner']),
+      isFavorite: json['isFavorite'] ?? false,
     );
   }
 }
