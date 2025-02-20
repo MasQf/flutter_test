@@ -106,8 +106,8 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
                 child: CupertinoButton(
                   padding: EdgeInsets.zero,
                   child: Center(
-                      child:
-                          Icon(Icons.close, color: Colors.white, size: 60.w)),
+                      child: Icon(Icons.close_rounded,
+                          color: Colors.white, size: 60.w)),
                   onPressed: () {
                     Get.back();
                   },

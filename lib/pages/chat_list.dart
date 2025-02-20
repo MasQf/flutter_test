@@ -137,9 +137,10 @@ class _ChatListPageState extends State<ChatListPage> {
                                         ),
                                         SizedBox(width: 30.w),
                                         Text(
-                                          formatDate(chat.lastMessage.time),
+                                          getFriendlyDate(
+                                              chat.lastMessage.time),
                                           style: TextStyle(
-                                            fontSize: 32.sp,
+                                            fontSize: 40.sp,
                                             color: kGrey,
                                           ),
                                         ),

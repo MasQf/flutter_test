@@ -1,5 +1,12 @@
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:test/api/api.dart';
+import 'package:test/enum/message_type.dart';
+import 'package:test/pages/photo_view.dart';
 
 class ChatBubblePainter extends CustomPainter {
   final bool isSentByMe;
@@ -103,50 +110,92 @@ class ChatBubble extends StatelessWidget {
   final double? height;
   final Color? myColor;
   final Color? targetColor;
+  final MessageType? messageType;
 
-  ChatBubble({
-    required this.isSentByMe,
-    required this.message,
-    this.width,
-    this.height,
-    this.myColor = const Color(0xFF3478f6),
-    this.targetColor = Colors.white,
-  });
+  ChatBubble(
+      {required this.isSentByMe,
+      required this.message,
+      this.width,
+      this.height,
+      this.myColor = const Color(0xFF3478f6),
+      this.targetColor = Colors.white,
+      this.messageType = MessageType.text});
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: ChatBubblePainter(
-        isSentByMe: isSentByMe,
-        myColor: myColor ?? const Color(0xFF3478f6),
-        targetColor: targetColor ?? Colors.white,
-      ),
-      child: Container(
-        width: width,
-        height: height,
-        constraints: BoxConstraints(
-          minWidth: 110.w,
-          minHeight: 90.w,
-          maxWidth: 0.5.sw,
-          maxHeight: 0.5.sw,
+    if (messageType == MessageType.image) {
+      List<String> images = [];
+      images = List<String>.from(jsonDecode(message));
+      return Container(
+        child: Column(
+          children: images
+              .asMap()
+              .map(
+                (index, image) => MapEntry(
+                  index,
+                  CupertinoButton(
+                    pressedOpacity: 0.8,
+                    onPressed: () {
+                      Get.to(
+                        () =>
+                            PhotoViewPage(images: images, initialIndex: index),
+                        transition: Transition.cupertino,
+                      );
+                    },
+                    padding: EdgeInsets.zero,
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 10.h),
+                      width: 0.4.sw,
+                      height: 0.5.sw,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20.r),
+                        child: Image.network(
+                          replaceLocalhost(image),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+              .values
+              .toList(),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 20.w),
-        child: IntrinsicWidth(
-          child: IntrinsicHeight(
-            child: Center(
-              child: Text(
+      );
+    } else if (messageType == MessageType.text)
+      return CustomPaint(
+        painter: ChatBubblePainter(
+          isSentByMe: isSentByMe,
+          myColor: myColor ?? const Color(0xFF3478f6),
+          targetColor: targetColor ?? Colors.white,
+        ),
+        child: Container(
+          width: width,
+          height: height,
+          constraints: BoxConstraints(
+            minWidth: 110.w,
+            minHeight: 90.w,
+            maxWidth: 0.5.sw,
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 20.w),
+          child: IntrinsicWidth(
+            child: IntrinsicHeight(
+              child: Center(
+                  child: Text(
                 message,
                 style: TextStyle(
                   color: isSentByMe ? Colors.white : Colors.black,
-                  fontSize: 37.sp,
+                  fontSize: 40.sp,
                 ),
                 maxLines: 5,
                 overflow: TextOverflow.ellipsis,
-              ),
+              )),
             ),
           ),
         ),
-      ),
-    );
+      );
+    else {
+      return Container();
+    }
   }
 }

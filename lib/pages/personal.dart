@@ -15,13 +15,12 @@ import 'package:test/api/api.dart';
 import 'package:test/api/user.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/controllers/user.dart';
+import 'package:test/enum/photo_type.dart';
 import 'package:test/pages/login.dart';
 import 'package:test/pages/photo_view.dart';
 import 'package:test/utils/token.dart';
 import 'package:test/widgets/button/cup_button.dart';
 import 'package:dio/dio.dart' as oid;
-
-enum PhotoType { avatar, background }
 
 class PersonalPage extends StatefulWidget {
   PersonalPage({super.key});
@@ -132,6 +131,9 @@ class _PersonalPageState extends State<PersonalPage> {
             userController.background.value = background;
           }
           break;
+
+        case PhotoType.image:
+          break;
       }
     }
   }
@@ -175,6 +177,9 @@ class _PersonalPageState extends State<PersonalPage> {
               userController.background.value = background;
             }
             break;
+
+          case PhotoType.image:
+            break;
         }
       }
     } catch (e) {
@@ -187,7 +192,7 @@ class _PersonalPageState extends State<PersonalPage> {
   }
 
   // 修改头像或背景图片
-  Future<void> _changePhoto(
+  Future<void> _changeBackground(
       {required PhotoType type, bool hasReview = false}) async {
     // 检查存储和位置权限
     final permissionState = await _getStoragePermission();
@@ -316,6 +321,8 @@ class _PersonalPageState extends State<PersonalPage> {
                                       hasPage: false),
                                   transition: Transition.cupertino,
                                 );
+                              case PhotoType.image:
+                                break;
                             }
                           },
                           child: Container(
@@ -394,7 +401,7 @@ class _PersonalPageState extends State<PersonalPage> {
             CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: () async {
-                await _changePhoto(
+                await _changeBackground(
                     type: PhotoType.avatar, hasReview: avatar != '');
               },
               child: Container(
@@ -457,7 +464,7 @@ class _PersonalPageState extends State<PersonalPage> {
                   infoButton(
                       text: '设置背景',
                       onPressed: () {
-                        _changePhoto(
+                        _changeBackground(
                             type: PhotoType.background,
                             hasReview: background != '');
                       },
