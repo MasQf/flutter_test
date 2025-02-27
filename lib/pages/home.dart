@@ -123,16 +123,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return ScrollingTitlePage(
       title: '发现',
-      children: [
+      titleAdapter: [
         Container(
           margin: EdgeInsets.symmetric(horizontal: 80.w),
           child: Column(
             children: [
-              Container(
-                color: kDevideColor,
-                height: 2.w,
-                width: 1.sw,
-              ),
               bigButton(CupertinoIcons.text_justifyleft, '浏览分区', () {}),
               Container(
                 color: kDevideColor,
@@ -559,7 +554,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               child: ScaleTransition(
                                 scale: _animations[index],
                                 child: Container(
-                                  height: 300.w,
+                                  height: 300.h,
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
                                       image: NetworkImage(

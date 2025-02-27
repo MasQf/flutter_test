@@ -111,6 +111,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   }
 
   @override
+  void deactivate() {
+    print('deactivate...');
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
     // 离开房间
     _socketService.leaveRoom(_roomId);

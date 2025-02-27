@@ -16,6 +16,7 @@ import 'package:test/api/user.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/enum/photo_type.dart';
+import 'package:test/pages/favorite.dart';
 import 'package:test/pages/login.dart';
 import 'package:test/pages/photo_view.dart';
 import 'package:test/utils/token.dart';
@@ -459,10 +460,18 @@ class _PersonalPageState extends State<PersonalPage> {
                 children: [
                   infoButton(text: '用户名、电子邮件', onPressed: () {}),
                   infoButton(text: '密码与安全性', onPressed: () {}),
+                  infoButton(
+                      text: '收藏列表',
+                      onPressed: () {
+                        Get.to(
+                          () => FavoritePage(),
+                          transition: Transition.cupertino,
+                        );
+                      }),
                   infoButton(text: '评价', onPressed: () {}),
                   infoButton(text: '称号', onPressed: () {}),
                   infoButton(
-                      text: '设置背景',
+                      text: '设置聊天背景',
                       onPressed: () {
                         _changeBackground(
                             type: PhotoType.background,
@@ -512,54 +521,74 @@ class _PersonalPageState extends State<PersonalPage> {
     required void Function() onPressed,
     bool hasDevider = true,
   }) {
-    return CupButton(
-      onPressed: onPressed,
-      child: Container(
-        child: Row(
-          children: [
-            SizedBox(width: 40.w),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: hasDevider
-                      ? Border(
-                          bottom: BorderSide(
-                          color: kDevideColor,
-                          width: 2.w,
-                        ))
-                      : null,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      children: [
+        CupButton(
+          onPressed: onPressed,
+          pressedColor: kDevideColor,
+          child: Container(
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    SizedBox(height: 25.w),
-                    Row(
-                      children: [
-                        Text(
-                          text,
-                          style: TextStyle(
-                            fontSize: 42.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
+                    SizedBox(width: 40.w),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: hasDevider
+                                ? Border(
+                                    bottom: BorderSide(color: kDevideColor))
+                                : null),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 25.w),
+                            Row(
+                              children: [
+                                Text(
+                                  text,
+                                  style: TextStyle(
+                                    fontSize: 42.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Spacer(),
+                                Icon(
+                                  CupertinoIcons.chevron_forward,
+                                  color: const Color(0xFFa4a4a9),
+                                  size: 50.w,
+                                ),
+                                SizedBox(width: 40.w),
+                              ],
+                            ),
+                            SizedBox(height: 25.w),
+                          ],
                         ),
-                        Spacer(),
-                        Icon(
-                          CupertinoIcons.chevron_forward,
-                          color: const Color(0xFFa4a4a9),
-                          size: 50.w,
-                        ),
-                        SizedBox(width: 40.w),
-                      ],
+                      ),
                     ),
-                    SizedBox(height: 25.w),
                   ],
                 ),
-              ),
+                // if (hasDevider)
+                //   Row(
+                //     children: [
+                //       Container(
+                //         width: 40.w,
+                //         height: 2.h,
+                //         color: Colors.white,
+                //       ),
+                //       Container(
+                //         width: 1.sw - 40.w,
+                //         height: 2.h,
+                //         color: kDevideColor,
+                //       ),
+                //     ],
+                //   ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

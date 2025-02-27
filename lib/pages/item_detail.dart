@@ -12,6 +12,7 @@ import 'package:test/controllers/user.dart';
 import 'package:test/models/item.dart';
 import 'package:test/pages/chat_detail.dart';
 import 'package:test/pages/photo_view.dart';
+import 'package:test/widgets/button/pressable_button.dart';
 import 'package:test/widgets/expandable_text.dart';
 
 class ItemDetailPage extends StatefulWidget {
@@ -41,8 +42,8 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
   late PageController _bannerController;
   int _bannerIndex = 0;
 
-  // late PageController _commentController;
-  // int _commentIndex = 0;
+  late PageController _commentController;
+  int _commentIndex = 0;
 
   final GlobalKey deviderKey = GlobalKey();
   double topHeight = 0;
@@ -53,7 +54,8 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     item = widget.item;
 
     _bannerController = PageController(initialPage: 0);
-    // _commentController = PageController(initialPage: 0);
+    _commentController =
+        PageController(initialPage: 0, viewportFraction: (1.sw - 160.w) / 1.sw);
     ItemApi.view(itemId: item.id); // 浏览数+1
     _loadItem();
     _scrollController.addListener(_checkIfContainerReachesTop);
@@ -64,7 +66,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     _scrollController.removeListener(_checkIfContainerReachesTop);
     _scrollController.dispose();
     _bannerController.dispose();
-    // _commentController.dispose();
+    _commentController.dispose();
     super.dispose();
   }
 
@@ -75,13 +77,13 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     if (renderBox == null) return;
 
     // 获取 devider 在屏幕中的位置
-    final Offset containerPosition = renderBox.localToGlobal(Offset.zero);
+    final Offset dividerPosition = renderBox.localToGlobal(Offset.zero);
 
     // // 获取 devider 的高度
-    // final double containerHeight = renderBox.size.height;
+    // final double deviderHeight = renderBox.size.height;
 
     // 判断 devider 是否触碰到了屏幕顶部
-    if (containerPosition.dy <= 0) {
+    if (dividerPosition.dy <= 0) {
       setState(() {
         topHeight = 200.h;
       });
@@ -196,6 +198,13 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     });
   }
 
+  double _getCommentMargin(int currentIndex, int expectIndex) {
+    if (currentIndex < expectIndex || currentIndex > expectIndex) {
+      return 40.w;
+    }
+    return 0; // 当前页面无偏移
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -210,6 +219,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
             child: SingleChildScrollView(
               controller: _scrollController,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   banner(), // 轮播图
                   Container(
@@ -265,7 +275,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                             child: Center(
                                               child: Icon(
                                                 CupertinoIcons.person_fill,
-                                                size: 60.w,
+                                                size: 70.w,
                                                 color: kGrey,
                                               ),
                                             ),
@@ -288,9 +298,8 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                               ),
                               SizedBox(height: 50.h),
                               //
-                              CupertinoButton(
+                              PressableButton(
                                 onPressed: () {},
-                                padding: EdgeInsets.zero,
                                 child: Container(
                                   width: 1.sw,
                                   padding: EdgeInsets.symmetric(vertical: 30.h),
@@ -337,78 +346,27 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                   Expanded(
                                     flex: 2,
                                     child: CupertinoButton(
-                                      onPressed: () {
-                                        if (!item.isFavorite) {
-                                          _showFavoriteDialog(context);
-                                          setState(() {
-                                            item.isFavorite = true;
-                                          });
-                                          ItemApi.favorite(itemId: item.id);
-                                        } else {
-                                          _showFavoriteDialog(context,
-                                              isFavorite: false);
-                                          setState(() {
-                                            item.isFavorite = false;
-                                          });
-                                          ItemApi.unFavorite(itemId: item.id);
-                                        }
-                                      },
+                                      onPressed: () {},
                                       padding: EdgeInsets.zero,
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 30.h),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border.all(
-                                            color: kMainColor,
-                                            width: 5.w,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(200.r),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              item.isFavorite
-                                                  ? CupertinoIcons
-                                                      .checkmark_circle_fill
-                                                  : CupertinoIcons
-                                                      .plus_circle_fill,
-                                              size: 50.w,
-                                              color: kMainColor,
-                                            ),
-                                            SizedBox(width: 10.w),
-                                            Text(
-                                              item.isFavorite ? '已收藏' : '收藏',
-                                              style: TextStyle(
-                                                fontSize: 45.sp,
-                                                color: kMainColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  if (item.isNegotiable) SizedBox(width: 30.w),
-                                  if (item.isNegotiable)
-                                    Expanded(
-                                      flex: 1,
-                                      child: CupertinoButton(
+                                      child: PressableButton(
                                         onPressed: () {
-                                          Get.to(
-                                            () => ChatDetailPage(
-                                              senderId: userController.id.value,
-                                              receiverId: item.owner.id,
-                                              targetName: item.owner.name,
-                                              targetAvatar: item.owner.avatar,
-                                            ),
-                                            transition: Transition.cupertino,
-                                          );
+                                          if (!item.isFavorite) {
+                                            _showFavoriteDialog(context);
+                                            setState(() {
+                                              item.isFavorite = true;
+                                              item.favoritesCount++;
+                                            });
+                                            ItemApi.favorite(itemId: item.id);
+                                          } else {
+                                            _showFavoriteDialog(context,
+                                                isFavorite: false);
+                                            setState(() {
+                                              item.isFavorite = false;
+                                              item.favoritesCount--;
+                                            });
+                                            ItemApi.unFavorite(itemId: item.id);
+                                          }
                                         },
-                                        padding: EdgeInsets.zero,
                                         child: Container(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 30.h),
@@ -426,20 +384,80 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                                 MainAxisAlignment.center,
                                             children: [
                                               Icon(
-                                                CupertinoIcons
-                                                    .ellipses_bubble_fill,
+                                                item.isFavorite
+                                                    ? CupertinoIcons
+                                                        .checkmark_circle_fill
+                                                    : CupertinoIcons
+                                                        .plus_circle_fill,
                                                 size: 50.w,
                                                 color: kMainColor,
                                               ),
                                               SizedBox(width: 10.w),
                                               Text(
-                                                '议价',
+                                                item.isFavorite ? '已收藏' : '收藏',
                                                 style: TextStyle(
                                                   fontSize: 45.sp,
                                                   color: kMainColor,
                                                 ),
                                               ),
                                             ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  if (item.isNegotiable) SizedBox(width: 30.w),
+                                  if (item.isNegotiable)
+                                    Expanded(
+                                      flex: 1,
+                                      child: CupertinoButton(
+                                        onPressed: () {},
+                                        padding: EdgeInsets.zero,
+                                        child: PressableButton(
+                                          onPressed: () {
+                                            Get.to(
+                                              () => ChatDetailPage(
+                                                senderId:
+                                                    userController.id.value,
+                                                receiverId: item.owner.id,
+                                                targetName: item.owner.name,
+                                                targetAvatar: item.owner.avatar,
+                                              ),
+                                              transition: Transition.cupertino,
+                                            );
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 30.h),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              border: Border.all(
+                                                color: kMainColor,
+                                                width: 5.w,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(200.r),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  CupertinoIcons
+                                                      .ellipses_bubble_fill,
+                                                  size: 50.w,
+                                                  color: kMainColor,
+                                                ),
+                                                SizedBox(width: 10.w),
+                                                Text(
+                                                  '议价',
+                                                  style: TextStyle(
+                                                    fontSize: 45.sp,
+                                                    color: kMainColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -453,7 +471,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                         Container(
                           key: deviderKey,
                           width: 1.sw,
-                          height: 2.w,
+                          height: 2.h,
                           margin: EdgeInsets.symmetric(horizontal: 80.w),
                           color: kDevideColor,
                         ),
@@ -464,15 +482,16 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                         SizedBox(height: 80.w),
                         Container(
                           width: 1.sw,
-                          height: 2.w,
+                          height: 2.h,
                           margin: EdgeInsets.symmetric(horizontal: 80.w),
                           color: kDevideColor,
                         ),
-                        // comment(), // 用户留言
+                        SizedBox(height: 60.w),
+                        comment(), // 用户留言
                         SizedBox(height: 80.w),
                         Container(
                           width: 1.sw,
-                          height: 2.w,
+                          height: 2.h,
                           margin: EdgeInsets.symmetric(horizontal: 80.w),
                           color: kDevideColor,
                         ),
@@ -789,7 +808,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                   ),
               ],
             ),
-          ), // 发布日期
+          ),
           // 发布日期
           Container(
             padding: EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
@@ -815,7 +834,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                     '${item.createdAt.month}月${item.createdAt.day}日',
                     style: TextStyle(
                       fontSize: 65.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                 ),
@@ -853,7 +872,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                     '${item.updatedAt.month}月${item.updatedAt.day}日',
                     style: TextStyle(
                       fontSize: 65.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                 ),
@@ -891,7 +910,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                     '${item.favoritesCount}',
                     style: TextStyle(
                       fontSize: 65.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                 ),
@@ -926,7 +945,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                     '${item.views}',
                     style: TextStyle(
                       fontSize: 65.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                 ),
@@ -944,16 +963,81 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     );
   }
 
-  // Widget comment() {
-  //   return PageView.builder(
-  //     controller: _commentController,
-  //     itemCount: 2,
-  //     onPageChanged: (index) {
-  //       setState(() {
-  //         _commentIndex = index;
-  //       });
-  //     },
-  //     itemBuilder: (context, index) {},
-  //   );
-  // }
+  Widget comment() {
+    return Container(
+      height: 550.h,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              SizedBox(width: 80.w),
+              Expanded(
+                child: CupertinoButton(
+                  onPressed: () {},
+                  padding: EdgeInsets.zero,
+                  child: Row(
+                    children: [
+                      Text(
+                        '用户留言',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 45.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              CupertinoButton(
+                onPressed: () {},
+                padding: EdgeInsets.zero,
+                child: Row(
+                  children: [
+                    Text(
+                      '查看全部',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 45.sp,
+                      ),
+                    ),
+                    Icon(
+                      CupertinoIcons.chevron_forward,
+                      color: kArrowGrey,
+                      size: 50.w,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 80.w),
+            ],
+          ),
+          SizedBox(height: 30.h),
+          Expanded(
+            child: PageView.builder(
+              controller: _commentController,
+              itemCount: 10,
+              physics: BouncingScrollPhysics(),
+              onPageChanged: (index) {
+                setState(() {
+                  _commentIndex = index;
+                });
+              },
+              itemBuilder: (context, index) {
+                return Container(
+                  width: 1.sw - 160.w,
+                  margin: EdgeInsets.symmetric(
+                    horizontal: _getCommentMargin(_commentIndex, index),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFf2f1f6),
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

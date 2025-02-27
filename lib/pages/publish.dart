@@ -290,7 +290,7 @@ class _PublishPageState extends State<PublishPage>
                                       padding:
                                           EdgeInsets.symmetric(vertical: 40.w),
                                       child: Text(
-                                        '7件物品、1个跑腿、1个活动',
+                                        '0件物品、0个跑腿、0个活动',
                                         style: TextStyle(
                                           fontSize: 40.sp,
                                           fontWeight: FontWeight.bold,

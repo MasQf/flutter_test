@@ -70,7 +70,7 @@ class _RootPageState extends State<RootPage> {
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     child: Padding(
-                      padding: EdgeInsets.only(top: 8.w),
+                      padding: EdgeInsets.only(top: 8.h),
                       child: Column(
                         children: [
                           Icon(
