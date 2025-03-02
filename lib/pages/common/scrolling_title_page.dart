@@ -13,8 +13,7 @@ class ScrollingTitlePage extends StatefulWidget {
   final String title;
   final List<Widget> children;
 
-  const ScrollingTitlePage(
-      {super.key, required this.title, required this.children});
+  const ScrollingTitlePage({super.key, required this.title, required this.children});
 
   @override
   State<ScrollingTitlePage> createState() => _ScrollingTitlePageState();
@@ -42,7 +41,7 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
         onNotification: (ScrollNotification notification) {
           if (notification.metrics.axis == Axis.vertical) {
             double offset = notification.metrics.pixels;
-            if (offset >= 152.w) {
+            if (offset >= 152.h) {
               SchedulerBinding.instance.addPostFrameCallback((_) {
                 setState(() {
                   _opacity = 1;
@@ -75,8 +74,7 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
               thicknessWhileDragging: 16.w,
               radius: Radius.circular(10.r),
               child: Container(
-                child:
-                    CustomScrollView(controller: _scrollController, slivers: [
+                child: CustomScrollView(controller: _scrollController, slivers: [
                   SliverToBoxAdapter(
                     child: Container(
                       padding: EdgeInsets.only(top: 0.1.sh),

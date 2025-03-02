@@ -218,19 +218,30 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       openAppSettings();
       return;
     }
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.camera);
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile == null) {
       return;
     } // 取消
 
-    final File imageFile = File(pickedFile.path);
+    setState(() {
+      isLoading = true;
+    });
 
-    // 上传文件
-    final String? imageUrl = await uploadFile(imageFile);
-    if (imageUrl != null) {
-      _images.add(imageUrl);
+    try {
+      final File imageFile = File(pickedFile.path);
+
+      // 上传文件
+      final String? imageUrl = await uploadFile(imageFile);
+      if (imageUrl != null) {
+        _images.add(imageUrl);
+      }
+    } catch (e) {
+      debugPrint('Error in _takePhoto: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -470,9 +481,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               Container(
                 width: 1.sw,
                 height: 130.w,
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(color: kDevideColor, width: 2.w))),
+                decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kDevideColor, width: 2.w))),
                 child: Stack(
                   children: [
                     Positioned(
@@ -497,8 +506,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         topRight: Radius.circular(30.r),
                       ),
                       child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 40.w, vertical: 30.w),
+                        padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 30.w),
                         child: Row(
                           children: [
                             CupertinoButton(
@@ -556,9 +564,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     // 获取键盘高度
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     // 根据键盘是否弹出动态调整高度
-    final bottomBoxHeight = _images.isNotEmpty
-        ? (keyboardHeight > 0 ? 0.35.sh : 0.4.sh)
-        : (keyboardHeight > 0 ? 120.h : 200.h);
+    final bottomBoxHeight =
+        _images.isNotEmpty ? (keyboardHeight > 0 ? 0.35.sh : 0.4.sh) : (keyboardHeight > 0 ? 120.h : 200.h);
 
     return Scaffold(
       body: Stack(
@@ -597,11 +604,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         return isMe
                             ? Container(
                                 width: 1.sw,
-                                margin: EdgeInsets.only(
-                                    bottom: 40.h,
-                                    top: index == _messages.length - 1
-                                        ? 40.h
-                                        : 0),
+                                margin: EdgeInsets.only(bottom: 40.h, top: index == _messages.length - 1 ? 40.h : 0),
                                 padding: EdgeInsets.symmetric(horizontal: 30.w),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -610,37 +613,26 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                     ChatBubble(
                                       isSentByMe: true,
                                       message: message.content,
-                                      messageType: message.type == 'text'
-                                          ? MessageType.text
-                                          : MessageType.image,
+                                      messageType: message.type == 'text' ? MessageType.text : MessageType.image,
                                     ),
                                     SizedBox(width: 30.w),
                                     CupertinoButton(
                                       padding: EdgeInsets.zero,
                                       onPressed: () {
-                                        _showInfo(
-                                            avatar: userController.avatar.value,
-                                            name: userController.name.value);
+                                        _showInfo(avatar: userController.avatar.value, name: userController.name.value);
                                       },
                                       child: Container(
                                         width: 100.w,
                                         height: 100.w,
                                         decoration: BoxDecoration(
                                             color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10.r),
-                                            image:
-                                                userController.avatar.value !=
-                                                        ''
-                                                    ? DecorationImage(
-                                                        image:
-                                                            CachedNetworkImageProvider(
-                                                                userController
-                                                                    .avatar
-                                                                    .value),
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : null),
+                                            borderRadius: BorderRadius.circular(10.r),
+                                            image: userController.avatar.value != ''
+                                                ? DecorationImage(
+                                                    image: CachedNetworkImageProvider(userController.avatar.value),
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                : null),
                                         child: userController.avatar.value != ''
                                             ? null
                                             : Center(
@@ -657,11 +649,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                               )
                             : Container(
                                 width: 1.sw,
-                                margin: EdgeInsets.only(
-                                    bottom: 40.h,
-                                    top: index == _messages.length - 1
-                                        ? 40.h
-                                        : 0),
+                                margin: EdgeInsets.only(bottom: 40.h, top: index == _messages.length - 1 ? 40.h : 0),
                                 padding: EdgeInsets.symmetric(horizontal: 30.w),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -669,23 +657,17 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                     CupertinoButton(
                                       padding: EdgeInsets.zero,
                                       onPressed: () {
-                                        _showInfo(
-                                            avatar: widget.targetAvatar,
-                                            name: widget.targetName);
+                                        _showInfo(avatar: widget.targetAvatar, name: widget.targetName);
                                       },
                                       child: Container(
                                         width: 100.w,
                                         height: 100.w,
                                         decoration: BoxDecoration(
                                             color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10.r),
+                                            borderRadius: BorderRadius.circular(10.r),
                                             image: widget.targetAvatar != ''
                                                 ? DecorationImage(
-                                                    image:
-                                                        CachedNetworkImageProvider(
-                                                            widget
-                                                                .targetAvatar),
+                                                    image: CachedNetworkImageProvider(widget.targetAvatar),
                                                     fit: BoxFit.cover)
                                                 : null),
                                         child: widget.targetAvatar != ''
@@ -703,9 +685,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                     ChatBubble(
                                       isSentByMe: false,
                                       message: message.content,
-                                      messageType: message.type == 'text'
-                                          ? MessageType.text
-                                          : MessageType.image,
+                                      messageType: message.type == 'text' ? MessageType.text : MessageType.image,
                                     ),
                                   ],
                                 ),
@@ -750,7 +730,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                 children: [
                                   CupertinoButton(
                                     padding: EdgeInsets.zero,
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      _takePhoto();
+                                    },
                                     child: Icon(
                                       CupertinoIcons.camera_fill,
                                       color: kGrey,
@@ -782,19 +764,14 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                     children: [
                                       _images.isNotEmpty
                                           ? ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(50.r),
+                                              borderRadius: BorderRadius.circular(50.r),
                                               child: AnimatedContainer(
-                                                duration:
-                                                    Duration(milliseconds: 200),
+                                                duration: Duration(milliseconds: 200),
                                                 width: 1.sw,
                                                 decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          50.r),
+                                                  borderRadius: BorderRadius.circular(50.r),
                                                   border: Border.all(
-                                                    color: CupertinoColors
-                                                        .placeholderText,
+                                                    color: CupertinoColors.placeholderText,
                                                     width: 2.w,
                                                   ),
                                                 ),
@@ -814,59 +791,36 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                                         children: [
                                                           Container(
                                                             width: 600.w,
-                                                            child:
-                                                                CupertinoTextField(
-                                                              controller:
-                                                                  _messageController,
-                                                              focusNode:
-                                                                  _focusNode,
+                                                            child: CupertinoTextField(
+                                                              controller: _messageController,
+                                                              focusNode: _focusNode,
                                                               placeholder: '信息',
-                                                              placeholderStyle:
-                                                                  TextStyle(
+                                                              placeholderStyle: TextStyle(
                                                                 fontSize: 40.sp,
-                                                                color: CupertinoColors
-                                                                    .placeholderText,
+                                                                color: CupertinoColors.placeholderText,
                                                               ),
-                                                              cursorHeight:
-                                                                  50.h,
+                                                              cursorHeight: 50.h,
                                                               style: TextStyle(
                                                                 fontSize: 40.sp,
-                                                                color: Colors
-                                                                    .black,
+                                                                color: Colors.black,
                                                               ),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Colors
-                                                                    .transparent,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            50.r),
-                                                                border:
-                                                                    Border.all(
-                                                                  color: Colors
-                                                                      .transparent,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.transparent,
+                                                                borderRadius: BorderRadius.circular(50.r),
+                                                                border: Border.all(
+                                                                  color: Colors.transparent,
                                                                   width: 2.w,
                                                                 ),
                                                               ),
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      horizontal:
-                                                                          30.w,
-                                                                      vertical:
-                                                                          15.h),
+                                                              padding: EdgeInsets.symmetric(
+                                                                  horizontal: 30.w, vertical: 15.h),
                                                             ),
                                                           ),
                                                           CupertinoButton(
-                                                            padding:
-                                                                EdgeInsets.zero,
+                                                            padding: EdgeInsets.zero,
                                                             onPressed: () {
-                                                              if (_images
-                                                                  .isNotEmpty) {
-                                                                _sendMessage(
-                                                                    messageType:
-                                                                        MessageType
-                                                                            .image);
+                                                              if (_images.isNotEmpty) {
+                                                                _sendMessage(messageType: MessageType.image);
                                                               } else {
                                                                 _sendMessage();
                                                               }
@@ -874,19 +828,14 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                                             child: Container(
                                                               width: 80.w,
                                                               height: 80.w,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                color: CupertinoColors
-                                                                    .activeGreen,
+                                                              decoration: BoxDecoration(
+                                                                shape: BoxShape.circle,
+                                                                color: CupertinoColors.activeGreen,
                                                               ),
                                                               child: Center(
                                                                 child: Icon(
-                                                                  CupertinoIcons
-                                                                      .arrow_up,
-                                                                  color: Colors
-                                                                      .white,
+                                                                  CupertinoIcons.arrow_up,
+                                                                  color: Colors.white,
                                                                   size: 60.w,
                                                                 ),
                                                               ),
@@ -903,11 +852,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                               width: 700.w,
                                               decoration: BoxDecoration(
                                                 color: CupertinoColors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(50.r),
+                                                borderRadius: BorderRadius.circular(50.r),
                                                 border: Border.all(
-                                                  color: CupertinoColors
-                                                      .placeholderText,
+                                                  color: CupertinoColors.placeholderText,
                                                   width: 2.w,
                                                 ),
                                               ),
@@ -916,15 +863,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                                   Container(
                                                     width: 600.w,
                                                     child: CupertinoTextField(
-                                                      controller:
-                                                          _messageController,
+                                                      controller: _messageController,
                                                       focusNode: _focusNode,
                                                       placeholder: '信息',
-                                                      placeholderStyle:
-                                                          TextStyle(
+                                                      placeholderStyle: TextStyle(
                                                         fontSize: 40.sp,
-                                                        color: CupertinoColors
-                                                            .placeholderText,
+                                                        color: CupertinoColors.placeholderText,
                                                       ),
                                                       cursorHeight: 50.h,
                                                       style: TextStyle(
@@ -932,31 +876,21 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                                         color: Colors.black,
                                                       ),
                                                       decoration: BoxDecoration(
-                                                        color: CupertinoColors
-                                                            .white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.r),
+                                                        color: CupertinoColors.white,
+                                                        borderRadius: BorderRadius.circular(50.r),
                                                         border: Border.all(
-                                                          color: Colors
-                                                              .transparent,
+                                                          color: Colors.transparent,
                                                           width: 2.w,
                                                         ),
                                                       ),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 30.w,
-                                                              vertical: 15.h),
+                                                      padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 15.h),
                                                     ),
                                                   ),
                                                   CupertinoButton(
                                                     padding: EdgeInsets.zero,
                                                     onPressed: () {
                                                       if (_images.isNotEmpty) {
-                                                        _sendMessage(
-                                                            messageType:
-                                                                MessageType
-                                                                    .image);
+                                                        _sendMessage(messageType: MessageType.image);
                                                       } else {
                                                         _sendMessage();
                                                       }
@@ -966,13 +900,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                                       height: 80.w,
                                                       decoration: BoxDecoration(
                                                         shape: BoxShape.circle,
-                                                        color: CupertinoColors
-                                                            .activeGreen,
+                                                        color: CupertinoColors.activeGreen,
                                                       ),
                                                       child: Center(
                                                         child: Icon(
-                                                          CupertinoIcons
-                                                              .arrow_up,
+                                                          CupertinoIcons.arrow_up,
                                                           color: Colors.white,
                                                           size: 60.w,
                                                         ),
@@ -1018,8 +950,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     child: GestureDetector(
                       onTap: () {
                         Get.to(
-                          () => PhotoViewPage(
-                              images: _images, initialIndex: index),
+                          () => PhotoViewPage(images: _images, initialIndex: index),
                           transition: Transition.cupertino,
                         );
                       },
@@ -1054,8 +985,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                   width: 70.w,
                                   height: 70.w,
                                   child: Center(
-                                    child: Icon(Icons.close_rounded,
-                                        color: Colors.white, size: 50.w),
+                                    child: Icon(Icons.close_rounded, color: Colors.white, size: 50.w),
                                   ),
                                   decoration: BoxDecoration(
                                       color: Colors.black.withOpacity(0.5),

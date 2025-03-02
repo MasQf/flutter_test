@@ -5,7 +5,7 @@ import 'package:test/api/api.dart';
 import 'package:test/api/user.dart';
 import 'package:test/utils/token.dart';
 import 'package:test/controllers/user.dart';
-import 'package:test/pages/login.dart';
+import 'package:test/pages/user/login.dart';
 import 'package:test/pages/root.dart';
 
 class SplashPage extends StatefulWidget {
@@ -46,8 +46,7 @@ class _SplashPageState extends State<SplashPage> {
           userController.avatar.value = res['user']['avatar'];
           userController.background.value = res['user']['background'];
 
-          Get.offAll(() => RootPage(),
-              transition: Transition.cupertino); // 跳转到首页
+          Get.offAll(() => RootPage(), transition: Transition.cupertino); // 跳转到首页
         } else {
           // 验证失败，跳转到登录页
           Get.offAll(() => LoginPage(), transition: Transition.cupertino);

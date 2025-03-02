@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test/constants/color.dart';
-import 'package:test/pages/chat_list.dart';
+import 'package:test/pages/chat/chat_list.dart';
 import 'package:test/pages/home.dart';
 import 'package:test/pages/personal.dart';
 import 'package:test/pages/publish.dart';
@@ -49,8 +49,7 @@ class _RootPageState extends State<RootPage> {
         height: 210.h, // 设置导航栏高度
         decoration: BoxDecoration(
             color: Colors.transparent, // 设置背景颜色
-            border: Border(
-                top: BorderSide(color: Color.fromARGB(255, 212, 212, 212)))),
+            border: Border(top: BorderSide(color: Color.fromARGB(255, 212, 212, 212)))),
         child: Stack(
           children: [
             Positioned.fill(
@@ -83,8 +82,7 @@ class _RootPageState extends State<RootPage> {
                             style: TextStyle(
                                 fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    _pageIndex == 0 ? kMainColor : kIconGrey),
+                                color: _pageIndex == 0 ? kMainColor : kIconGrey),
                           ),
                         ],
                       ),
@@ -109,8 +107,7 @@ class _RootPageState extends State<RootPage> {
                             style: TextStyle(
                                 fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    _pageIndex == 1 ? kMainColor : kIconGrey),
+                                color: _pageIndex == 1 ? kMainColor : kIconGrey),
                           ),
                         ],
                       ),
@@ -134,12 +131,11 @@ class _RootPageState extends State<RootPage> {
                             ),
                           ),
                           Text(
-                            '消息',
+                            '信息',
                             style: TextStyle(
                                 fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    _pageIndex == 2 ? kMainColor : kIconGrey),
+                                color: _pageIndex == 2 ? kMainColor : kIconGrey),
                           ),
                         ],
                       ),
@@ -164,8 +160,7 @@ class _RootPageState extends State<RootPage> {
                             style: TextStyle(
                                 fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    _pageIndex == 3 ? kMainColor : kIconGrey),
+                                color: _pageIndex == 3 ? kMainColor : kIconGrey),
                           ),
                         ],
                       ),

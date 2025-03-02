@@ -24,8 +24,7 @@ class PublishPage extends StatefulWidget {
   State<PublishPage> createState() => _PublishPageState();
 }
 
-class _PublishPageState extends State<PublishPage>
-    with TickerProviderStateMixin {
+class _PublishPageState extends State<PublishPage> with TickerProviderStateMixin {
   PublishController publishController = Get.put(PublishController());
   UserController userController = Get.find<UserController>();
   final ScrollController _scrollController = ScrollController();
@@ -68,9 +67,7 @@ class _PublishPageState extends State<PublishPage>
       vsync: this,
     );
     // 加载数据并监听
-    publishController
-        .loadPublishList(userId: userController.id.value)
-        .then((_) {
+    publishController.loadPublishList(userId: userController.id.value).then((_) {
       _initializeAnimations(); // 数据加载完成后初始化动画
       setState(() {}); // 刷新界面
     });
@@ -253,22 +250,19 @@ class _PublishPageState extends State<PublishPage>
                                 height: 2.w,
                                 width: 1.sw,
                               ),
-                              bigButton(CupertinoIcons.archivebox_fill, '闲置物品',
-                                  () {}),
+                              bigButton(CupertinoIcons.archivebox_fill, '闲置物品', () {}),
                               Container(
                                 color: kDevideColor,
                                 height: 2.w,
                                 width: 1.sw,
                               ),
-                              bigButton(
-                                  CupertinoIcons.hare_fill, '校园跑腿', () {}),
+                              bigButton(CupertinoIcons.hare_fill, '校园跑腿', () {}),
                               Container(
                                 color: kDevideColor,
                                 height: 2.w,
                                 width: 1.sw,
                               ),
-                              bigButton(
-                                  CupertinoIcons.person_3_fill, '组织活动', () {}),
+                              bigButton(CupertinoIcons.person_3_fill, '组织活动', () {}),
                               Container(
                                 color: kDevideColor,
                                 height: 2.w,
@@ -287,10 +281,9 @@ class _PublishPageState extends State<PublishPage>
                                   children: [
                                     Container(
                                       width: 1.sw,
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 40.w),
+                                      padding: EdgeInsets.symmetric(vertical: 40.w),
                                       child: Text(
-                                        '7件物品、1个跑腿、1个活动',
+                                        '0件物品、0个跑腿、0个活动',
                                         style: TextStyle(
                                           fontSize: 40.sp,
                                           fontWeight: FontWeight.bold,
@@ -305,8 +298,7 @@ class _PublishPageState extends State<PublishPage>
                                     ),
                                     Container(
                                       width: 1.sw,
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 30.w),
+                                      padding: EdgeInsets.symmetric(vertical: 30.w),
                                       child: Row(
                                         children: [
                                           Text(
@@ -350,18 +342,13 @@ class _PublishPageState extends State<PublishPage>
                                             child: Container(
                                               padding: EdgeInsets.all(10.w),
                                               decoration: BoxDecoration(
-                                                color: isGrid
-                                                    ? Colors.transparent
-                                                    : Colors.black,
-                                                borderRadius:
-                                                    BorderRadius.circular(10.r),
+                                                color: isGrid ? Colors.transparent : Colors.black,
+                                                borderRadius: BorderRadius.circular(10.r),
                                               ),
                                               child: Icon(
                                                 CupertinoIcons.list_bullet,
                                                 size: 70.w,
-                                                color: isGrid
-                                                    ? Colors.black
-                                                    : Colors.white,
+                                                color: isGrid ? Colors.black : Colors.white,
                                               ),
                                             ),
                                           ),
@@ -379,21 +366,17 @@ class _PublishPageState extends State<PublishPage>
                       isGrid
                           ? Obx(
                               () => SliverGrid(
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2,
                                   crossAxisSpacing: 60.w,
                                   childAspectRatio: 493 / 815,
                                 ),
                                 delegate: SliverChildBuilderDelegate(
                                   (context, index) {
-                                    ItemModel item =
-                                        publishController.publishList[index];
+                                    ItemModel item = publishController.publishList[index];
                                     // 计算左右间距
-                                    double leftMargin =
-                                        index % 2 == 0 ? 80.w : 0; // 左侧元素加左边距
-                                    double rightMargin =
-                                        index % 2 == 1 ? 80.w : 0; // 右侧元素加右边距
+                                    double leftMargin = index % 2 == 0 ? 80.w : 0; // 左侧元素加左边距
+                                    double rightMargin = index % 2 == 1 ? 80.w : 0; // 右侧元素加右边距
                                     return Container(
                                       margin: EdgeInsets.only(
                                         left: leftMargin, // 左侧动态边距
@@ -405,12 +388,9 @@ class _PublishPageState extends State<PublishPage>
                                       child: Column(
                                         children: [
                                           GestureDetector(
-                                            onTapDown: (details) =>
-                                                _onTapDown(index, details),
-                                            onTapUp: (details) =>
-                                                _onTapUp(index, item, details),
-                                            onTapCancel: () =>
-                                                _onTapCancel(index),
+                                            onTapDown: (details) => _onTapDown(index, details),
+                                            onTapUp: (details) => _onTapUp(index, item, details),
+                                            onTapCancel: () => _onTapCancel(index),
                                             child: ScaleTransition(
                                               scale: _animations[index],
                                               child: Container(
@@ -418,22 +398,16 @@ class _PublishPageState extends State<PublishPage>
                                                 height: 580.w,
                                                 decoration: BoxDecoration(
                                                   image: DecorationImage(
-                                                    image:
-                                                        CachedNetworkImageProvider(
-                                                      replaceLocalhost(
-                                                          item.images[0]),
+                                                    image: CachedNetworkImageProvider(
+                                                      replaceLocalhost(item.images[0]),
                                                     ),
                                                     fit: BoxFit.cover,
                                                   ),
-                                                  color: CupertinoColors
-                                                      .extraLightBackgroundGray,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.r),
+                                                  color: CupertinoColors.extraLightBackgroundGray,
+                                                  borderRadius: BorderRadius.circular(10.r),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: Color.fromARGB(
-                                                          255, 220, 220, 220),
+                                                      color: Color.fromARGB(255, 220, 220, 220),
                                                       blurRadius: 20.w,
                                                     ),
                                                   ],
@@ -481,8 +455,7 @@ class _PublishPageState extends State<PublishPage>
                                                 ),
                                               ),
                                               Text(
-                                                extractParts(item.price)[
-                                                    'fractionalPartStr'],
+                                                extractParts(item.price)['fractionalPartStr'],
                                                 style: TextStyle(
                                                   fontSize: 37.sp,
                                                   fontWeight: FontWeight.bold,
@@ -491,15 +464,13 @@ class _PublishPageState extends State<PublishPage>
                                               ),
                                               Spacer(),
                                               GestureDetector(
-                                                onTapDown:
-                                                    (TapDownDetails details) {
+                                                onTapDown: (TapDownDetails details) {
                                                   if (showControl) {
                                                     showControl = false;
                                                     _dotController.reverse();
                                                     return;
                                                   }
-                                                  toggleControl(
-                                                      details, item.id);
+                                                  toggleControl(details, item.id);
                                                 },
                                                 child: Icon(
                                                   CupertinoIcons.ellipsis,
@@ -513,8 +484,7 @@ class _PublishPageState extends State<PublishPage>
                                       ),
                                     );
                                   },
-                                  childCount:
-                                      publishController.publishList.length,
+                                  childCount: publishController.publishList.length,
                                 ),
                               ),
                             )
@@ -522,29 +492,21 @@ class _PublishPageState extends State<PublishPage>
                               () => SliverList(
                                 delegate: SliverChildBuilderDelegate(
                                   (context, index) {
-                                    ItemModel item =
-                                        publishController.publishList[index];
+                                    ItemModel item = publishController.publishList[index];
 
                                     return Column(
                                       children: [
                                         Container(
                                             width: 1.sw,
                                             height: 260.w,
-                                            margin: EdgeInsets.symmetric(
-                                                vertical: 40.w,
-                                                horizontal: 80.w),
+                                            margin: EdgeInsets.symmetric(vertical: 40.w, horizontal: 80.w),
                                             color: Colors.transparent,
                                             child: Row(
                                               children: [
                                                 GestureDetector(
-                                                  onTapDown: (details) =>
-                                                      _onTapDown(
-                                                          index, details),
-                                                  onTapUp: (details) =>
-                                                      _onTapUp(
-                                                          index, item, details),
-                                                  onTapCancel: () =>
-                                                      _onTapCancel(index),
+                                                  onTapDown: (details) => _onTapDown(index, details),
+                                                  onTapUp: (details) => _onTapUp(index, item, details),
+                                                  onTapCancel: () => _onTapCancel(index),
                                                   child: ScaleTransition(
                                                     scale: _animations[index],
                                                     child: Container(
@@ -552,25 +514,16 @@ class _PublishPageState extends State<PublishPage>
                                                       width: 200.w,
                                                       decoration: BoxDecoration(
                                                         color: kDevideColor,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.r),
+                                                        borderRadius: BorderRadius.circular(10.r),
                                                         image: DecorationImage(
-                                                          image:
-                                                              CachedNetworkImageProvider(
-                                                            replaceLocalhost(
-                                                                item.images[0]),
+                                                          image: CachedNetworkImageProvider(
+                                                            replaceLocalhost(item.images[0]),
                                                           ),
                                                           fit: BoxFit.cover,
                                                         ),
                                                         boxShadow: [
                                                           BoxShadow(
-                                                            color:
-                                                                Color.fromARGB(
-                                                                    255,
-                                                                    220,
-                                                                    220,
-                                                                    220),
+                                                            color: Color.fromARGB(255, 220, 220, 220),
                                                             blurRadius: 20.w,
                                                           ),
                                                         ],
@@ -580,12 +533,9 @@ class _PublishPageState extends State<PublishPage>
                                                 ),
                                                 SizedBox(width: 35.w),
                                                 Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 30.w),
+                                                  padding: EdgeInsets.symmetric(vertical: 30.w),
                                                   child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Container(
                                                         width: 600.w,
@@ -594,12 +544,10 @@ class _PublishPageState extends State<PublishPage>
                                                           style: TextStyle(
                                                             fontSize: 37.sp,
                                                             color: Colors.black,
-                                                            fontWeight:
-                                                                FontWeight.bold,
+                                                            fontWeight: FontWeight.bold,
                                                             height: 2.w,
                                                           ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                                          overflow: TextOverflow.ellipsis,
                                                           maxLines: 1,
                                                         ),
                                                       ),
@@ -610,11 +558,9 @@ class _PublishPageState extends State<PublishPage>
                                                           style: TextStyle(
                                                             fontSize: 35.sp,
                                                             color: kGrey,
-                                                            fontWeight:
-                                                                FontWeight.bold,
+                                                            fontWeight: FontWeight.bold,
                                                           ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                                          overflow: TextOverflow.ellipsis,
                                                           maxLines: 1,
                                                         ),
                                                       ),
@@ -627,166 +573,99 @@ class _PublishPageState extends State<PublishPage>
                                                               children: [
                                                                 Text(
                                                                   '￥',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        30.sp,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color:
-                                                                        kMainColor,
+                                                                  style: TextStyle(
+                                                                    fontSize: 30.sp,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: kMainColor,
                                                                   ),
                                                                 ),
                                                                 Text(
                                                                   '${extractParts(item.price)['integerPartStr']}',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        50.sp,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color:
-                                                                        kMainColor,
+                                                                  style: TextStyle(
+                                                                    fontSize: 50.sp,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: kMainColor,
                                                                   ),
                                                                 ),
                                                                 Text(
                                                                   '.',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        37.sp,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color:
-                                                                        kMainColor,
+                                                                  style: TextStyle(
+                                                                    fontSize: 37.sp,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: kMainColor,
                                                                   ),
                                                                 ),
                                                                 Text(
-                                                                  extractParts(item
-                                                                          .price)[
-                                                                      'fractionalPartStr'],
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        37.sp,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color:
-                                                                        kMainColor,
+                                                                  extractParts(item.price)['fractionalPartStr'],
+                                                                  style: TextStyle(
+                                                                    fontSize: 37.sp,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: kMainColor,
                                                                   ),
                                                                 ),
                                                                 Spacer(),
                                                                 Container(
-                                                                  margin: EdgeInsets
-                                                                      .only(
-                                                                          right:
-                                                                              10.w),
+                                                                  margin: EdgeInsets.only(right: 10.w),
                                                                   padding: EdgeInsets.symmetric(
-                                                                      horizontal:
-                                                                          15.w,
-                                                                      vertical:
-                                                                          5.w),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: _getCategoryColor(
-                                                                        item.category),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            200.r),
+                                                                      horizontal: 15.w, vertical: 5.w),
+                                                                  decoration: BoxDecoration(
+                                                                    color: _getCategoryColor(item.category),
+                                                                    borderRadius: BorderRadius.circular(200.r),
                                                                   ),
                                                                   child: Center(
                                                                     child: Text(
                                                                       item.category,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            30.sp,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        color: Colors
-                                                                            .white,
+                                                                      style: TextStyle(
+                                                                        fontSize: 30.sp,
+                                                                        fontWeight: FontWeight.bold,
+                                                                        color: Colors.white,
                                                                       ),
-                                                                      textHeightBehavior:
-                                                                          TextHeightBehavior(
-                                                                        applyHeightToFirstAscent:
-                                                                            false,
-                                                                        applyHeightToLastDescent:
-                                                                            false,
+                                                                      textHeightBehavior: TextHeightBehavior(
+                                                                        applyHeightToFirstAscent: false,
+                                                                        applyHeightToLastDescent: false,
                                                                       ),
                                                                     ),
                                                                   ),
                                                                 ),
-                                                                if (item
-                                                                    .isNegotiable)
+                                                                if (item.isNegotiable)
                                                                   Container(
-                                                                    margin: EdgeInsets.only(
-                                                                        right: 10
-                                                                            .w),
+                                                                    margin: EdgeInsets.only(right: 10.w),
                                                                     padding: EdgeInsets.symmetric(
-                                                                        horizontal: 15
-                                                                            .w,
-                                                                        vertical:
-                                                                            5.w),
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: Colors
-                                                                          .green,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              200.r),
+                                                                        horizontal: 15.w, vertical: 5.w),
+                                                                    decoration: BoxDecoration(
+                                                                      color: Colors.green,
+                                                                      borderRadius: BorderRadius.circular(200.r),
                                                                     ),
-                                                                    child:
-                                                                        Center(
-                                                                      child:
-                                                                          Text(
+                                                                    child: Center(
+                                                                      child: Text(
                                                                         '可议价',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              30.sp,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                          color:
-                                                                              Colors.white,
+                                                                        style: TextStyle(
+                                                                          fontSize: 30.sp,
+                                                                          fontWeight: FontWeight.bold,
+                                                                          color: Colors.white,
                                                                         ),
-                                                                        textHeightBehavior:
-                                                                            TextHeightBehavior(
-                                                                          applyHeightToFirstAscent:
-                                                                              false,
-                                                                          applyHeightToLastDescent:
-                                                                              false,
+                                                                        textHeightBehavior: TextHeightBehavior(
+                                                                          applyHeightToFirstAscent: false,
+                                                                          applyHeightToLastDescent: false,
                                                                         ),
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                SizedBox(
-                                                                    width:
-                                                                        30.w),
+                                                                SizedBox(width: 30.w),
                                                               ],
                                                             ),
                                                           ),
                                                           GestureDetector(
-                                                            onTapDown:
-                                                                (TapDownDetails
-                                                                    details) {
+                                                            onTapDown: (TapDownDetails details) {
                                                               if (showControl) {
-                                                                showControl =
-                                                                    false;
-                                                                _dotController
-                                                                    .reverse();
+                                                                showControl = false;
+                                                                _dotController.reverse();
                                                                 return;
                                                               }
-                                                              toggleControl(
-                                                                  details,
-                                                                  item.id);
+                                                              toggleControl(details, item.id);
                                                             },
                                                             child: Icon(
-                                                              CupertinoIcons
-                                                                  .ellipsis,
+                                                              CupertinoIcons.ellipsis,
                                                               color: kGrey,
                                                               size: 60.w,
                                                             ),
@@ -798,23 +677,18 @@ class _PublishPageState extends State<PublishPage>
                                                 ),
                                               ],
                                             )),
-                                        index <
-                                                publishController
-                                                        .publishList.length -
-                                                    1
+                                        index < publishController.publishList.length - 1
                                             ? Container(
                                                 width: 1.sw,
                                                 height: 2.w,
-                                                margin: EdgeInsets.symmetric(
-                                                    horizontal: 80.w),
+                                                margin: EdgeInsets.symmetric(horizontal: 80.w),
                                                 color: kDevideColor,
                                               )
                                             : SizedBox(height: 50.w),
                                       ],
                                     );
                                   },
-                                  childCount: publishController
-                                      .publishList.length, // 列表项数量
+                                  childCount: publishController.publishList.length, // 列表项数量
                                 ),
                               ),
                             ),
