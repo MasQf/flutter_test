@@ -21,6 +21,7 @@ void main() async {
     systemNavigationBarColor: Colors.white,
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
+  await initializeDateFormatting('zh_CN', null);
   runApp(const MyApp());
 }
 

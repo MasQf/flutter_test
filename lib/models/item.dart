@@ -9,13 +9,14 @@ class ItemModel {
   final List<String> images;
   final bool status;
   final String location;
-  final int views;
-  final int favoritesCount;
+  int views;
+  int favoritesCount;
   final bool isNegotiable;
   final DateTime createdAt;
   final DateTime updatedAt;
   final UserModel owner;
   bool isFavorite;
+  bool isSelected;
 
   ItemModel({
     required this.id,
@@ -33,6 +34,7 @@ class ItemModel {
     required this.updatedAt,
     required this.owner,
     this.isFavorite = false,
+    this.isSelected = false,
   });
 
   factory ItemModel.fromJson(Map<String, dynamic> json) {

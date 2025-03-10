@@ -10,7 +10,7 @@ import 'package:test/api/item.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/models/item.dart';
-import 'package:test/pages/chat_detail.dart';
+import 'package:test/pages/chat/chat_detail.dart';
 import 'package:test/pages/photo_view.dart';
 import 'package:test/widgets/expandable_text.dart';
 
@@ -70,8 +70,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
 
   void _checkIfContainerReachesTop() {
     // 获取 devider 的渲染对象
-    final RenderBox? renderBox =
-        deviderKey.currentContext?.findRenderObject() as RenderBox;
+    final RenderBox? renderBox = deviderKey.currentContext?.findRenderObject() as RenderBox;
     if (renderBox == null) return;
 
     // 获取 devider 在屏幕中的位置
@@ -141,9 +140,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                       children: [
                         SizedBox(height: 80.h),
                         Icon(
-                          isFavorite
-                              ? CupertinoIcons.text_badge_checkmark
-                              : CupertinoIcons.text_badge_minus,
+                          isFavorite ? CupertinoIcons.text_badge_checkmark : CupertinoIcons.text_badge_minus,
                           color: Color(0xFF555555),
                           size: 300.w,
                         ),
@@ -248,8 +245,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                               shape: BoxShape.circle,
                                               image: DecorationImage(
                                                 image: NetworkImage(
-                                                  replaceLocalhost(
-                                                      item.owner.avatar),
+                                                  replaceLocalhost(item.owner.avatar),
                                                 ),
                                                 fit: BoxFit.cover,
                                               ),
@@ -345,8 +341,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                           });
                                           ItemApi.favorite(itemId: item.id);
                                         } else {
-                                          _showFavoriteDialog(context,
-                                              isFavorite: false);
+                                          _showFavoriteDialog(context, isFavorite: false);
                                           setState(() {
                                             item.isFavorite = false;
                                           });
@@ -355,27 +350,22 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                       },
                                       padding: EdgeInsets.zero,
                                       child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 30.h),
+                                        padding: EdgeInsets.symmetric(vertical: 30.h),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           border: Border.all(
                                             color: kMainColor,
                                             width: 5.w,
                                           ),
-                                          borderRadius:
-                                              BorderRadius.circular(200.r),
+                                          borderRadius: BorderRadius.circular(200.r),
                                         ),
                                         child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               item.isFavorite
-                                                  ? CupertinoIcons
-                                                      .checkmark_circle_fill
-                                                  : CupertinoIcons
-                                                      .plus_circle_fill,
+                                                  ? CupertinoIcons.checkmark_circle_fill
+                                                  : CupertinoIcons.plus_circle_fill,
                                               size: 50.w,
                                               color: kMainColor,
                                             ),
@@ -410,24 +400,20 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                         },
                                         padding: EdgeInsets.zero,
                                         child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 30.h),
+                                          padding: EdgeInsets.symmetric(vertical: 30.h),
                                           decoration: BoxDecoration(
                                             color: Colors.white,
                                             border: Border.all(
                                               color: kMainColor,
                                               width: 5.w,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(200.r),
+                                            borderRadius: BorderRadius.circular(200.r),
                                           ),
                                           child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               Icon(
-                                                CupertinoIcons
-                                                    .ellipses_bubble_fill,
+                                                CupertinoIcons.ellipses_bubble_fill,
                                                 size: 50.w,
                                                 color: kMainColor,
                                               ),
@@ -529,8 +515,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                           padding: EdgeInsets.zero,
                           child: Container(
                             constraints: BoxConstraints(maxWidth: 0.4.sw),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 40.w, vertical: 10.h),
+                            padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 10.h),
                             decoration: BoxDecoration(
                               color: kMainColor,
                               borderRadius: BorderRadius.circular(200.r),
@@ -581,8 +566,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
               ),
               child: CupertinoButton(
                 padding: EdgeInsets.zero,
-                child: Center(
-                    child: Icon(Icons.close, color: Colors.white, size: 60.w)),
+                child: Center(child: Icon(Icons.close, color: Colors.white, size: 60.w)),
                 onPressed: () {
                   Get.back();
                 },
@@ -606,10 +590,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap: () {
-                  Get.to(
-                      () => PhotoViewPage(
-                          images: item.images, initialIndex: index),
-                      transition: Transition.fadeIn);
+                  Get.to(() => PhotoViewPage(images: item.images, initialIndex: index), transition: Transition.fadeIn);
                 },
                 child: Image.network(
                   replaceLocalhost(item.images[index]),
@@ -638,9 +619,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
               height: 20.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _bannerIndex == index
-                    ? Colors.black
-                    : kGrey.withOpacity(0.5),
+                color: _bannerIndex == index ? Colors.black : kGrey.withOpacity(0.5),
               ),
             );
           }),

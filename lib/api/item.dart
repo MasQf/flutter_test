@@ -1,4 +1,5 @@
 import 'package:test/api/api.dart';
+import 'package:test/models/favorite.dart';
 import 'package:test/models/item.dart';
 
 class ItemApi {
@@ -76,6 +77,25 @@ class ItemApi {
       return status;
     } catch (e) {
       throw Exception("Error unFavorite: $e");
+    }
+  }
+
+  /// 收藏列表
+  static Future<List<FavoriteModel>> favoriteList(
+      {int page = 1, int size = 10}) async {
+    try {
+      final response = await Api().post('/favorites', data: {
+        'page': page,
+        'size': size,
+      });
+
+      List<dynamic> itemListJson = response.data['favorites'];
+      List<FavoriteModel> itemList =
+          itemListJson.map((json) => FavoriteModel.fromJson(json)).toList();
+
+      return itemList;
+    } catch (e) {
+      throw Exception("Error get favorite list: $e");
     }
   }
 
