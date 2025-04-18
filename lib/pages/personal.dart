@@ -1,27 +1,26 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mime/mime.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:test/api/api.dart';
 import 'package:test/api/user.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/enum/photo_type.dart';
+import 'package:test/pages/buy_trade.dart';
+import 'package:test/pages/campus_map_page.dart';
 import 'package:test/pages/favorite.dart';
 import 'package:test/pages/photo_view.dart';
+import 'package:test/pages/sell_trade.dart';
+import 'package:test/pages/user/edit_profile.dart';
 import 'package:test/pages/user/login.dart';
 import 'package:test/utils/token.dart';
+import 'package:test/utils/upload.dart';
 import 'package:test/widgets/button/cup_button.dart';
-import 'package:dio/dio.dart' as oid;
 
 class PersonalPage extends StatefulWidget {
   PersonalPage({super.key});
@@ -39,66 +38,10 @@ class _PersonalPageState extends State<PersonalPage> {
 
   bool isLoading = false;
 
-  Future<String> uploadFile(File file) async {
-    final dio = Dio();
-
-    try {
-      // 检查文件是否存在
-      if (!file.existsSync()) {
-        debugPrint('文件不存在: ${file.path}');
-        return '';
-      }
-
-      // 自动检测文件的 MIME 类型
-      final mimeType = lookupMimeType(file.path);
-      print('检测到的文件 MIME 类型: $mimeType');
-
-      // 构建 headers
-      dio.options.headers = {
-        'Content-Type': 'multipart/form-data',
-      };
-
-      // 构建 FormData
-      final formData = oid.FormData.fromMap({
-        'file': await oid.MultipartFile.fromFile(
-          file.path,
-          filename: file.path.split('/').last, // 设置文件名
-          contentType: mimeType != null
-              ? MediaType.parse(mimeType) // 设置正确的 MIME 类型
-              : MediaType('application', 'octet-stream'), // 默认值
-        ),
-      });
-
-      // 发送请求
-      final response = await dio.post(
-        '${BASE_URL}/upload_file',
-        data: formData,
-      );
-
-      // 处理响应
-      if (response.statusCode == 200) {
-        print('上传成功: ${response.data}');
-        return response.data['fileUrl'];
-      } else {
-        debugPrint('上传失败: ${response.statusCode}, 消息: ${response.data}');
-      }
-    } catch (e) {
-      debugPrint('上传发生异常: $e');
-    }
-    return '';
-  }
-
-  /// 获取存储权限
-  Future<bool> _getStoragePermission() async {
-    final PermissionStatus status = defaultTargetPlatform == TargetPlatform.iOS
-        ? await Permission.photosAddOnly.request()
-        : await Permission.storage.request();
-    return status.isGranted;
-  }
-
   //  拍照处理逻辑
   Future<void> _takePhoto({required PhotoType type}) async {
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile == null) {
       return;
@@ -115,7 +58,8 @@ class _PersonalPageState extends State<PersonalPage> {
             avatar = imageUrl;
           });
           if (avatar.isNotEmpty) {
-            await UserApi.uploadAvator(userId: userController.id.value, avatar: avatar);
+            await UserApi.uploadAvator(
+                userId: userController.id.value, avatar: avatar);
             userController.avatar.value = avatar;
           }
           break;
@@ -125,7 +69,8 @@ class _PersonalPageState extends State<PersonalPage> {
             background = imageUrl;
           });
           if (background.isNotEmpty) {
-            await UserApi.uploadBackground(userId: userController.id.value, background: background);
+            await UserApi.uploadBackground(
+                userId: userController.id.value, background: background);
             userController.background.value = background;
           }
           break;
@@ -138,7 +83,8 @@ class _PersonalPageState extends State<PersonalPage> {
 
   // 相册选择图片
   Future<void> _selectPhoto({required PhotoType type}) async {
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile == null) return; // 用户取消选择
 
@@ -158,7 +104,8 @@ class _PersonalPageState extends State<PersonalPage> {
               avatar = imageUrl;
             });
             if (avatar.isNotEmpty) {
-              await UserApi.uploadAvator(userId: userController.id.value, avatar: avatar);
+              await UserApi.uploadAvator(
+                  userId: userController.id.value, avatar: avatar);
               userController.avatar.value = avatar;
             }
             break;
@@ -168,7 +115,8 @@ class _PersonalPageState extends State<PersonalPage> {
               background = imageUrl;
             });
             if (background.isNotEmpty) {
-              await UserApi.uploadBackground(userId: userController.id.value, background: background);
+              await UserApi.uploadBackground(
+                  userId: userController.id.value, background: background);
               userController.background.value = background;
             }
             break;
@@ -187,9 +135,10 @@ class _PersonalPageState extends State<PersonalPage> {
   }
 
   // 修改头像或背景图片
-  Future<void> _changeBackground({required PhotoType type, bool hasReview = false}) async {
+  Future<void> _changeBackground(
+      {required PhotoType type, bool hasReview = false}) async {
     // 检查存储和位置权限
-    final permissionState = await _getStoragePermission();
+    final permissionState = await getStoragePermission();
     if (!permissionState) {
       // 权限被拒绝 打开手机上该App的权限设置页面
       openAppSettings();
@@ -301,12 +250,18 @@ class _PersonalPageState extends State<PersonalPage> {
                             switch (type) {
                               case PhotoType.avatar:
                                 Get.to(
-                                  () => PhotoViewPage(images: [avatar], initialIndex: 0, hasPage: false),
+                                  () => PhotoViewPage(
+                                      images: [avatar],
+                                      initialIndex: 0,
+                                      hasPage: false),
                                   transition: Transition.cupertino,
                                 );
                               case PhotoType.background:
                                 Get.to(
-                                  () => PhotoViewPage(images: [background], initialIndex: 0, hasPage: false),
+                                  () => PhotoViewPage(
+                                      images: [background],
+                                      initialIndex: 0,
+                                      hasPage: false),
                                   transition: Transition.cupertino,
                                 );
                               case PhotoType.image:
@@ -389,7 +344,8 @@ class _PersonalPageState extends State<PersonalPage> {
             CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: () async {
-                await _changeBackground(type: PhotoType.avatar, hasReview: avatar != '');
+                await _changeBackground(
+                    type: PhotoType.avatar, hasReview: avatar != '');
               },
               child: Container(
                 width: 230.w,
@@ -444,8 +400,26 @@ class _PersonalPageState extends State<PersonalPage> {
                   ))),
               child: Column(
                 children: [
-                  infoButton(text: '用户名、电子邮件', onPressed: () {}),
-                  infoButton(text: '密码与安全性', onPressed: () {}),
+                  infoButton(
+                    text: '我卖出的',
+                    onPressed: () {
+                      Get.to(() => SellTradePage(),
+                          transition: Transition.cupertino);
+                    },
+                  ),
+                  infoButton(
+                    text: '我买到的',
+                    onPressed: () {
+                      Get.to(() => BuyTradePage(),
+                          transition: Transition.cupertino);
+                    },
+                  ),
+                  // infoButton(
+                  //     text: '用户名、电子邮件、密码',
+                  //     onPressed: () {
+                  //       Get.to(() => EditProfilePage(),
+                  //           transition: Transition.cupertino);
+                  //     }),
                   infoButton(
                       text: '收藏列表',
                       onPressed: () {
@@ -454,14 +428,14 @@ class _PersonalPageState extends State<PersonalPage> {
                           transition: Transition.cupertino,
                         );
                       }),
-                  infoButton(text: '评价', onPressed: () {}),
-                  infoButton(text: '称号', onPressed: () {}),
                   infoButton(
-                      text: '设置聊天背景',
-                      onPressed: () {
-                        _changeBackground(type: PhotoType.background, hasReview: background != '');
-                      },
-                      hasDevider: false),
+                    text: '设置聊天背景',
+                    onPressed: () {
+                      _changeBackground(
+                          type: PhotoType.background,
+                          hasReview: background != '');
+                    },
+                  ),
                 ],
               ),
             ),
@@ -474,7 +448,8 @@ class _PersonalPageState extends State<PersonalPage> {
                 },
                 child: Container(
                   width: 1.sw,
-                  padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 25.w),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 40.w, vertical: 25.w),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border.symmetric(
@@ -517,8 +492,11 @@ class _PersonalPageState extends State<PersonalPage> {
                     SizedBox(width: 40.w),
                     Expanded(
                       child: Container(
-                        decoration:
-                            BoxDecoration(border: hasDevider ? Border(bottom: BorderSide(color: kDevideColor)) : null),
+                        decoration: BoxDecoration(
+                            border: hasDevider
+                                ? Border(
+                                    bottom: BorderSide(color: kDevideColor))
+                                : null),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

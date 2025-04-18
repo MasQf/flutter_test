@@ -10,7 +10,8 @@ import 'package:test/controllers/user.dart';
 import 'package:test/models/item.dart';
 import 'package:test/pages/common/scrolling_title_page.dart';
 import 'package:test/pages/item_detail.dart';
-import 'package:test/widgets/button/big_button.dart';
+import 'package:test/pages/item_list_page.dart';
+import 'package:test/pages/search.dart';
 import 'package:test/widgets/button/cup_button.dart';
 
 class HomePage extends StatefulWidget {
@@ -128,11 +129,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           margin: EdgeInsets.symmetric(horizontal: 80.w),
           child: Column(
             children: [
-              bigButton(CupertinoIcons.text_justifyleft, '浏览分区', () {}),
-              Container(
-                color: kDevideColor,
-                height: 2.w,
-                width: 1.sw,
+              // bigButton(CupertinoIcons.text_justifyleft, '浏览分区', () {}),
+              SizedBox(height: 20.h),
+              CupertinoSearchTextField(
+                prefixIcon: Icon(
+                  CupertinoIcons.search,
+                  size: 50.w,
+                ),
+                suffixIcon: Icon(
+                  CupertinoIcons.xmark_circle_fill,
+                  size: 50.w,
+                ),
+                style: TextStyle(
+                  fontSize: 40.sp,
+                ),
+                onSubmitted: (value) {
+                  if (value.isNotEmpty) {
+                    Get.to(
+                      () => SearchPage(keyword: value),
+                      transition: Transition.cupertino,
+                    );
+                  }
+                },
               ),
             ],
           ),
@@ -315,7 +333,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               Row(
                                 children: [
                                   CupertinoButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Get.to(
+                                        () => ItemListPage(
+                                          title: '收藏榜单',
+                                          listType: ListType.favoriteRank,
+                                        ),
+                                        transition: Transition.cupertino,
+                                      );
+                                    },
                                     padding: EdgeInsets.zero,
                                     child: Text(
                                       '查看更多',
@@ -462,7 +488,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               Row(
                                 children: [
                                   CupertinoButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Get.to(
+                                        () => ItemListPage(
+                                          title: '浏览榜单',
+                                          listType: ListType.viewRank,
+                                        ),
+                                        transition: Transition.cupertino,
+                                      );
+                                    },
                                     padding: EdgeInsets.zero,
                                     child: Text(
                                       '查看更多',
@@ -607,7 +641,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Row(
                   children: [
                     CupertinoButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(
+                          () => ItemListPage(
+                            title: '最近发布',
+                            listType: ListType.latest,
+                          ),
+                          transition: Transition.cupertino,
+                        );
+                      },
                       padding: EdgeInsets.zero,
                       child: Text(
                         '查看更多',

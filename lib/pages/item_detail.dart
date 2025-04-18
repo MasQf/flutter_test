@@ -7,19 +7,25 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:test/api/api.dart';
 import 'package:test/api/item.dart';
+import 'package:test/api/trade.dart';
 import 'package:test/constants/color.dart';
+import 'package:test/controllers/deal.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/models/item.dart';
+import 'package:test/pages/campus_map_page.dart';
 import 'package:test/pages/chat/chat_detail.dart';
 import 'package:test/pages/photo_view.dart';
+import 'package:test/widgets/button/cup_button.dart';
 import 'package:test/widgets/expandable_text.dart';
 
 class ItemDetailPage extends StatefulWidget {
   final ItemModel item;
+  final bool canBuy;
 
   const ItemDetailPage({
     super.key,
     required this.item,
+    this.canBuy = true,
   });
 
   @override
@@ -28,6 +34,8 @@ class ItemDetailPage extends StatefulWidget {
 
 class _ItemDetailPageState extends State<ItemDetailPage> {
   final UserController userController = Get.find<UserController>();
+  final DealController dealController = Get.find<DealController>();
+
   final double imageHeight = 0.7.sh;
   late ItemModel item;
 
@@ -46,6 +54,96 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
 
   final GlobalKey deviderKey = GlobalKey();
   double topHeight = 0;
+
+  // 默认初始值
+  DateTime _date = DateTime.now();
+  Duration _time = Duration(hours: DateTime.now().hour, minutes: DateTime.now().minute);
+
+  // 显示日期和时间选择器
+  Future<void> _showDateTimePicker(BuildContext context) async {
+    await showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 0.4.sh,
+          color: CupertinoColors.white,
+          child: Column(
+            children: [
+              SizedBox(height: 40.h),
+              Row(
+                children: [
+                  // 日期选择器
+                  Container(
+                    width: 0.5.sw,
+                    height: 400.h,
+                    child: CupertinoDatePicker(
+                      mode: CupertinoDatePickerMode.date,
+                      initialDateTime: _date,
+                      onDateTimeChanged: (DateTime newDate) {
+                        setState(() {
+                          _date = newDate;
+                        });
+                      },
+                    ),
+                  ),
+                  // 时间选择器
+                  Container(
+                    width: 0.5.sw,
+                    height: 400.h,
+                    child: CupertinoTimerPicker(
+                      mode: CupertinoTimerPickerMode.hm,
+                      initialTimerDuration: _time,
+                      onTimerDurationChanged: (Duration newDuration) {
+                        setState(() {
+                          _time = newDuration;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 80.h),
+              // 确认按钮
+              CupertinoButton(
+                onPressed: () {
+                  setState(() {
+                    dealController.date.value = DateTime(
+                      _date.year,
+                      _date.month,
+                      _date.day,
+                      _time.inHours,
+                      _time.inMinutes % 60,
+                    );
+                  });
+                  Get.back();
+                },
+                padding: EdgeInsets.zero,
+                child: Container(
+                  width: 1.sw,
+                  height: 130.h,
+                  margin: EdgeInsets.symmetric(horizontal: 80.w),
+                  decoration: BoxDecoration(
+                    color: kMainColor,
+                    borderRadius: BorderRadius.circular(50.r),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '确认',
+                      style: TextStyle(
+                        fontSize: 50.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -89,6 +187,289 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
         topHeight = 0;
       });
     }
+  }
+
+  void _showBuy({required ItemModel item}) {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: true,
+        enableDrag: false,
+        // barrierColor: Colors.black.withOpacity(0),
+        builder: (context) {
+          return Container(
+            width: 1.sw,
+            height: 0.7.sh,
+            decoration: BoxDecoration(
+              color: kBackColor,
+              borderRadius: BorderRadius.circular(30.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 20,
+                  offset: Offset(0, -3),
+                )
+              ],
+            ),
+            child: Stack(
+              children: [
+                Container(
+                  width: 1.sw,
+                  padding: EdgeInsets.only(top: 170.h),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40.w),
+                        child: Row(
+                          children: [
+                            CupertinoButton(
+                              onPressed: () {
+                                Get.to(
+                                  PhotoViewPage(images: item.images, initialIndex: 0),
+                                  transition: Transition.cupertino,
+                                );
+                              },
+                              padding: EdgeInsets.zero,
+                              child: Container(
+                                width: 300.w,
+                                height: 300.w,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20.r),
+                                    image: DecorationImage(
+                                      image: NetworkImage(
+                                        replaceLocalhost(item.images[0]),
+                                      ),
+                                      fit: BoxFit.cover,
+                                    )),
+                              ),
+                            ),
+                            SizedBox(width: 30.w),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 1.sw - 80.w - 300.w - 30.w,
+                                  child: Text(
+                                    item.description,
+                                    style: TextStyle(
+                                      fontSize: 35.sp,
+                                    ),
+                                    maxLines: 4,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Text(
+                                  'RMB￥${item.price}',
+                                  style: TextStyle(
+                                    fontSize: 45.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: kMainColor,
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 30.h),
+                      Container(
+                        width: 1.sw,
+                        height: 2.h,
+                        color: kDevideColor,
+                      ),
+                      CupButton(
+                        onPressed: () {
+                          Get.to(() => CampusMapPage(), transition: Transition.cupertino);
+                        },
+                        child: Container(
+                          width: 1.sw,
+                          height: 200.h,
+                          padding: EdgeInsets.symmetric(horizontal: 40.w),
+                          child: Row(
+                            children: [
+                              Text(
+                                '📍',
+                                style: TextStyle(fontSize: 80.w),
+                              ),
+                              Container(
+                                width: 0.68.sw,
+                                child: Obx(
+                                  () => Text(
+                                    dealController.location.value != '' ? dealController.location.value : '选择交易地点',
+                                    style: TextStyle(
+                                      fontSize: 40.sp,
+                                    ),
+                                    maxLines: 2,
+                                  ),
+                                ),
+                              ),
+                              Spacer(),
+                              Icon(
+                                CupertinoIcons.chevron_forward,
+                                size: 70.w,
+                                color: kArrowGrey,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 1.sw,
+                        height: 2.h,
+                        color: kDevideColor,
+                      ),
+                      CupButton(
+                          onPressed: () {
+                            _showDateTimePicker(context);
+                          },
+                          child: Container(
+                            width: 1.sw,
+                            height: 200.h,
+                            padding: EdgeInsets.symmetric(horizontal: 40.w),
+                            child: Row(
+                              children: [
+                                Text(
+                                  ' 📅 ',
+                                  style: TextStyle(fontSize: 60.w),
+                                ),
+                                Container(
+                                  width: 0.68.sw,
+                                  child: Obx(
+                                    () => Text(
+                                      dealController.date.value != null
+                                          ? '交易时间:\n ${dealController.formatDate}'
+                                          : '尚未选择交易时间',
+                                      style: TextStyle(
+                                        fontSize: 40.sp,
+                                      ),
+                                      maxLines: 2,
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                                Icon(
+                                  CupertinoIcons.chevron_forward,
+                                  size: 70.w,
+                                  color: kArrowGrey,
+                                ),
+                              ],
+                            ),
+                          )),
+                      Spacer(),
+                      CupertinoButton(
+                        onPressed: () async {
+                          Get.back();
+                          Get.back();
+                          await TradeApi.createTrade(
+                              sellerId: item.owner.id,
+                              buyerId: userController.id.value,
+                              itemId: item.id,
+                              location: dealController.location.value,
+                              tradeTime: dealController.formatDate);
+                        },
+                        padding: EdgeInsets.zero,
+                        child: Container(
+                          width: 1.sw,
+                          height: 130.h,
+                          margin: EdgeInsets.symmetric(horizontal: 80.w),
+                          decoration: BoxDecoration(
+                            color: kMainColor,
+                            borderRadius: BorderRadius.circular(50.r),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '发起',
+                              style: TextStyle(
+                                fontSize: 50.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 150.h),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 1.sw,
+                  height: 130.h,
+                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: kDevideColor, width: 2.w))),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30.r),
+                            topRight: Radius.circular(30.r),
+                          ),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                            child: Container(
+                              width: 1.sw,
+                              height: 130.w,
+                              color: Colors.white.withOpacity(0.7),
+                            ),
+                          ),
+                        ),
+                      ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30.r),
+                          topRight: Radius.circular(30.r),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 30.w),
+                          child: Row(
+                            children: [
+                              CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () {},
+                                child: Text(
+                                  '完成',
+                                  style: TextStyle(
+                                    fontSize: 45.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                              ),
+                              Spacer(),
+                              Text(
+                                '发起交易',
+                                style: TextStyle(
+                                  fontSize: 45.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Spacer(),
+                              CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () {
+                                  Get.back();
+                                },
+                                child: Text(
+                                  '取消',
+                                  style: TextStyle(
+                                    fontSize: 45.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: kMainColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        });
   }
 
   void _showFavoriteDialog(BuildContext context, {bool isFavorite = true}) {
@@ -156,7 +537,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                         ),
                         SizedBox(height: 30.h),
                         Text(
-                          isFavorite ? '已收藏至“个人”的“收藏列表”中。' : '已从“收藏列表”移除。',
+                          isFavorite ? '已收藏至"个人"的"收藏列表"中。' : '已从"收藏列表"移除。',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 40.sp,
@@ -284,49 +665,52 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                               ),
                               SizedBox(height: 50.h),
                               //
-                              CupertinoButton(
-                                onPressed: () {},
-                                padding: EdgeInsets.zero,
-                                child: Container(
-                                  width: 1.sw,
-                                  padding: EdgeInsets.symmetric(vertical: 30.h),
-                                  decoration: BoxDecoration(
-                                    color: kMainColor,
-                                    border: Border.all(
+                              if (widget.canBuy)
+                                CupertinoButton(
+                                  onPressed: () {
+                                    _showBuy(item: item);
+                                  },
+                                  padding: EdgeInsets.zero,
+                                  child: Container(
+                                    width: 1.sw,
+                                    padding: EdgeInsets.symmetric(vertical: 30.h),
+                                    decoration: BoxDecoration(
                                       color: kMainColor,
-                                      width: 5.w,
+                                      border: Border.all(
+                                        color: kMainColor,
+                                        width: 5.w,
+                                      ),
+                                      borderRadius: BorderRadius.circular(200.r),
                                     ),
-                                    borderRadius: BorderRadius.circular(200.r),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '购买',
-                                        style: TextStyle(
-                                          fontSize: 45.sp,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          '购买',
+                                          style: TextStyle(
+                                            fontSize: 45.sp,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        SizedBox(width: 20.w),
+                                        Container(
+                                          width: 4.w,
+                                          height: 50.h,
                                           color: Colors.white,
                                         ),
-                                      ),
-                                      SizedBox(width: 20.w),
-                                      Container(
-                                        width: 4.w,
-                                        height: 50.h,
-                                        color: Colors.white,
-                                      ),
-                                      SizedBox(width: 20.w),
-                                      Text(
-                                        'RMB￥${item.price}',
-                                        style: TextStyle(
-                                          fontSize: 45.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                        SizedBox(width: 20.w),
+                                        Text(
+                                          'RMB￥${item.price}',
+                                          style: TextStyle(
+                                            fontSize: 45.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
                               SizedBox(height: 30.w),
                               Row(
                                 children: [
@@ -382,8 +766,8 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                       ),
                                     ),
                                   ),
-                                  if (item.isNegotiable) SizedBox(width: 30.w),
-                                  if (item.isNegotiable)
+                                  if (widget.canBuy) SizedBox(width: 30.w),
+                                  if (widget.canBuy)
                                     Expanded(
                                       flex: 1,
                                       child: CupertinoButton(
@@ -419,7 +803,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                               ),
                                               SizedBox(width: 10.w),
                                               Text(
-                                                '议价',
+                                                '想要',
                                                 style: TextStyle(
                                                   fontSize: 45.sp,
                                                   color: kMainColor,
@@ -456,13 +840,13 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                         ),
                         // comment(), // 用户留言
                         SizedBox(height: 80.w),
-                        Container(
-                          width: 1.sw,
-                          height: 2.w,
-                          margin: EdgeInsets.symmetric(horizontal: 80.w),
-                          color: kDevideColor,
-                        ),
-                        SizedBox(height: 1000.h),
+                        // Container(
+                        //   width: 1.sw,
+                        //   height: 2.w,
+                        //   margin: EdgeInsets.symmetric(horizontal: 80.w),
+                        //   color: kDevideColor,
+                        // ),
+                        // SizedBox(height: 1000.h),
                       ],
                     ),
                   ),
@@ -511,7 +895,9 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: CupertinoButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            _showBuy(item: item);
+                          },
                           padding: EdgeInsets.zero,
                           child: Container(
                             constraints: BoxConstraints(maxWidth: 0.4.sw),

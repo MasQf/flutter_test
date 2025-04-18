@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:test/api/api.dart';
 import 'package:test/api/user.dart';
+import 'package:test/controllers/deal.dart';
 import 'package:test/utils/token.dart';
 import 'package:test/controllers/user.dart';
 import 'package:test/pages/user/login.dart';
@@ -14,7 +15,8 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  UserController userController = Get.put(UserController());
+  final UserController userController = Get.put(UserController());
+  final DealController dealController = Get.put(DealController());
 
   @override
   void initState() {

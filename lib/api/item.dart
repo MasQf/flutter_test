@@ -107,4 +107,65 @@ class ItemApi {
       throw Exception("Error views+1: $e");
     }
   }
+
+  // 删除物品
+  static Future<void> delete({required String itemId}) async {
+    try {
+      await Api().post('/delete', data: {"itemId": itemId});
+    } catch (e) {
+      throw Exception("Error delete item: $e");
+    }
+  }
+
+  // 搜索
+  static Future<List<ItemModel>> search({required String keyword}) async {
+    try {
+      final response = await Api().post('/search', data: {"keyword": keyword});
+      List<dynamic> itemListJson = response.data['items'];
+      List<ItemModel> itemList =
+          itemListJson.map((json) => ItemModel.fromJson(json)).toList();
+
+      return itemList;
+    } catch (e) {
+      throw Exception("Error delete item: $e");
+    }
+  }
+
+  /// 获取最多收藏的物品列表(分页查询)
+  static Future<List<ItemModel>> mostFavoritesItems(
+      {int page = 1, int size = 3}) async {
+    try {
+      final response = await Api().post('/most_favorites_items', data: {
+        'page': page,
+        'size': size,
+      });
+
+      List<dynamic> itemListJson = response.data['items'];
+      List<ItemModel> itemList =
+          itemListJson.map((json) => ItemModel.fromJson(json)).toList();
+
+      return itemList;
+    } catch (e) {
+      throw Exception("Error get most favorites items: $e");
+    }
+  }
+
+  /// 获取最多浏览的物品列表(分页查询)
+  static Future<List<ItemModel>> mostViewsItems(
+      {int page = 1, int size = 3}) async {
+    try {
+      final response = await Api().post('/most_views_items', data: {
+        'page': page,
+        'size': size,
+      });
+
+      List<dynamic> itemListJson = response.data['items'];
+      List<ItemModel> itemList =
+          itemListJson.map((json) => ItemModel.fromJson(json)).toList();
+
+      return itemList;
+    } catch (e) {
+      throw Exception("Error get most views items: $e");
+    }
+  }
 }

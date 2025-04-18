@@ -6,7 +6,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:test/api/api.dart';
-import 'package:test/api/item.dart';
 import 'package:test/constants/color.dart';
 import 'package:test/constants/text.dart';
 import 'package:test/controllers/item.dart';
@@ -63,14 +62,12 @@ class _FavoritePageState extends State<FavoritePage> {
   }
 
   void checkPosition() {
-    final RenderBox renderBox1 =
-        key1.currentContext?.findRenderObject() as RenderBox;
+    final RenderBox renderBox1 = key1.currentContext?.findRenderObject() as RenderBox;
     final position1 = renderBox1.localToGlobal(Offset.zero);
     final size1 = renderBox1.size;
     final bottom1 = position1.dy + size1.height; // 第一个 Container 的底部
 
-    final RenderBox renderBox2 =
-        key2.currentContext?.findRenderObject() as RenderBox;
+    final RenderBox renderBox2 = key2.currentContext?.findRenderObject() as RenderBox;
     final position2 = renderBox2.localToGlobal(Offset.zero);
     final top2 = position2.dy; // 第二个 Container 的顶部
 
@@ -131,8 +128,7 @@ class _FavoritePageState extends State<FavoritePage> {
               thicknessWhileDragging: 16.w,
               radius: Radius.circular(10.r),
               child: Container(
-                child:
-                    CustomScrollView(controller: _scrollController, slivers: [
+                child: CustomScrollView(controller: _scrollController, slivers: [
                   SliverToBoxAdapter(
                     child: Container(
                       padding: EdgeInsets.only(top: 0.1.sh),
@@ -192,8 +188,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                     Center(
                                       child: Column(
                                         children: [
-                                          CupertinoActivityIndicator(
-                                              radius: 30.r),
+                                          CupertinoActivityIndicator(radius: 30.r),
                                           SizedBox(height: 10.h),
                                           Text(
                                             '正在载入',
@@ -290,9 +285,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                                 child: Icon(
                                                   CupertinoIcons.chevron_back,
                                                   size: 70.w,
-                                                  color: isEditing
-                                                      ? Colors.transparent
-                                                      : kMainColor,
+                                                  color: isEditing ? Colors.transparent : kMainColor,
                                                 ),
                                               ),
                                               Text(
@@ -441,14 +434,10 @@ class _FavoritePageState extends State<FavoritePage> {
                             width: 60.w,
                             height: 60.w,
                             decoration: BoxDecoration(
-                                color: item.item.isSelected
-                                    ? kMainColor
-                                    : Colors.white,
+                                color: item.item.isSelected ? kMainColor : Colors.white,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: item.item.isSelected
-                                      ? kMainColor
-                                      : kArrowGrey,
+                                  color: item.item.isSelected ? kMainColor : kArrowGrey,
                                   width: 6.w,
                                 )),
                             child: Center(
@@ -463,11 +452,7 @@ class _FavoritePageState extends State<FavoritePage> {
                       ),
                     Container(
                       width: isEditing ? 1.sw - 80.w - 50.w : 1.sw,
-                      padding: EdgeInsets.only(
-                          left: isEditing ? 40.w : 80.w,
-                          right: 80.w,
-                          top: 60.h,
-                          bottom: 60.h),
+                      padding: EdgeInsets.only(left: isEditing ? 40.w : 80.w, right: 80.w, top: 60.h, bottom: 60.h),
                       decoration: BoxDecoration(
                         color: Colors.white,
                       ),
@@ -480,8 +465,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                 onPressed: () {
                                   if (isEditing) {
                                     setState(() {
-                                      item.item.isSelected =
-                                          !item.item.isSelected;
+                                      item.item.isSelected = !item.item.isSelected;
                                     });
                                   } else {
                                     Get.to(
@@ -490,8 +474,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                     );
                                   }
                                 },
-                                child: AnimatedContainer(
-                                  duration: Duration(milliseconds: 200),
+                                child: Container(
                                   height: _imageHeight,
                                   width: _imageWidth,
                                   decoration: BoxDecoration(
@@ -504,8 +487,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color:
-                                            Color.fromARGB(255, 199, 199, 199),
+                                        color: Color.fromARGB(255, 199, 199, 199),
                                         blurRadius: 20.w,
                                       ),
                                     ],
@@ -533,8 +515,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                   duration: Duration(milliseconds: 200),
                                   height: isEditing ? _imageHeight : 200.h,
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
@@ -561,6 +542,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                 if (!isEditing)
                                   Container(
                                     child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           '${item.item.description}',
@@ -574,12 +556,10 @@ class _FavoritePageState extends State<FavoritePage> {
                                         PressableButton(
                                           onPressed: () {},
                                           child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 5.h),
+                                            padding: EdgeInsets.symmetric(vertical: 5.h),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(50.r),
+                                              borderRadius: BorderRadius.circular(50.r),
                                               border: Border.all(
                                                 color: kMainColor,
                                                 width: 5.w,
@@ -612,8 +592,7 @@ class _FavoritePageState extends State<FavoritePage> {
                   ? Container(
                       width: 1.sw,
                       height: 2.h,
-                      margin: EdgeInsets.only(
-                          left: isEditing ? 150.w : 80.w, right: 80.w),
+                      margin: EdgeInsets.only(left: isEditing ? 150.w : 80.w, right: 80.w),
                       color: kDevideColor,
                     )
                   : SizedBox(height: isEditing ? 250.h : 120.h)
@@ -733,6 +712,7 @@ class _FavoritePageState extends State<FavoritePage> {
                         onPressed: () async {
                           Get.back();
                           await itemController.removeSelectedFavorites();
+                          setState(() {});
                         },
                         child: Container(
                           width: 1.sw,

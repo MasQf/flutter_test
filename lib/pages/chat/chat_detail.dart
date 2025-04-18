@@ -23,6 +23,7 @@ import 'package:test/controllers/user.dart';
 import 'package:test/enum/message_type.dart';
 import 'package:test/enum/photo_type.dart';
 import 'package:test/models/message.dart';
+import 'package:test/pages/campus_map_page.dart';
 import 'package:test/pages/photo_view.dart';
 import 'package:test/services/socket.dart';
 import 'package:test/widgets/chat_bubble.dart';
@@ -385,76 +386,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                             infoButton(
                               onPressed: () {},
                               title: '评价',
-                            ),
-                            infoButton(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(30.r),
-                                bottomRight: Radius.circular(30.r),
-                              ),
-                              onPressed: () {},
-                              title: '称号',
-                              hasDevider: false,
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 80.w),
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 60.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30.r),
-                        ),
-                        child: Column(
-                          children: [
-                            infoButton(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30.r),
-                                topRight: Radius.circular(30.r),
-                              ),
-                              onPressed: () {},
-                              title: '发布',
-                              hasDevider: true,
-                            ),
-                            infoButton(
-                              onPressed: () {},
-                              title: '评价',
-                              hasDevider: true,
-                            ),
-                            infoButton(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(30.r),
-                                bottomRight: Radius.circular(30.r),
-                              ),
-                              onPressed: () {},
-                              title: '称号',
-                              hasDevider: false,
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 80.w),
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 60.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30.r),
-                        ),
-                        child: Column(
-                          children: [
-                            infoButton(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30.r),
-                                topRight: Radius.circular(30.r),
-                              ),
-                              onPressed: () {},
-                              title: '发布',
-                              hasDevider: true,
-                            ),
-                            infoButton(
-                              onPressed: () {},
-                              title: '评价',
-                              hasDevider: true,
                             ),
                             infoButton(
                               borderRadius: BorderRadius.only(

@@ -25,7 +25,9 @@ dependencies:
   mime: ^2.0.0
   http_parser: ^4.0.2
   flutter_sticky_header: ^0.7.0
-  cached_network_image: ^3.4.1
+  cached_network_image: ^3.3.1
+  flutter_map: ^4.0.0
+  latlong2: ^0.8.0     # 用于处理经纬度
 
 dev_dependencies:
   flutter_test:

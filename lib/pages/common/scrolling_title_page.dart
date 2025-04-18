@@ -14,6 +14,7 @@ class ScrollingTitlePage extends StatefulWidget {
   final List<Widget> titleAdapter;
   final bool canBack;
   final SliverList? sliverList;
+  final Widget? actionButton;
 
   const ScrollingTitlePage({
     super.key,
@@ -21,6 +22,7 @@ class ScrollingTitlePage extends StatefulWidget {
     required this.titleAdapter,
     this.canBack = false,
     this.sliverList,
+    this.actionButton,
   });
 
   @override
@@ -73,6 +75,7 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false,
       body: NotificationListener<ScrollNotification>(
         onNotification: (ScrollNotification notification) {
           if (notification.metrics.axis == Axis.vertical) {
@@ -152,6 +155,7 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
                             ),
                           ),
                           Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: widget.titleAdapter,
                           )
                         ],
@@ -207,6 +211,7 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
                           children: [
                             Container(
                               width: 300.w,
+                              height: 80.h,
                               child: widget.canBack
                                   ? CupertinoButton(
                                       onPressed: () {
@@ -277,7 +282,13 @@ class _ScrollingTitlePageState extends State<ScrollingTitlePage> {
                               ),
                             ),
                             Spacer(),
-                            Container(width: 300.w),
+                            Container(
+                              width: 300.w,
+                              height: 80.h,
+                              child: Center(
+                                child: widget.actionButton,
+                              ),
+                            ),
                           ],
                         ),
                       ],

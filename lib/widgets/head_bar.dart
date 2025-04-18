@@ -12,11 +12,13 @@ class HeadBar extends StatefulWidget {
       {super.key,
       required this.title,
       this.canBack = false,
-      this.pressBack = _defaultPressBack});
+      this.pressBack = _defaultPressBack,
+      this.rightWidget});
 
   final String title;
   final bool canBack;
   final void Function() pressBack;
+  final Widget? rightWidget;
 
   static void _defaultPressBack() {
     Get.back();
@@ -100,6 +102,13 @@ class _HeadBarState extends State<HeadBar> {
             ),
           ],
         ),
+        // 右侧组件
+        if (widget.rightWidget != null)
+          Positioned(
+            top: 80.h,
+            right: 20.w,
+            child: widget.rightWidget!,
+          ),
       ]),
     );
   }
