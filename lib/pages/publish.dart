@@ -181,29 +181,6 @@ class _PublishPageState extends State<PublishPage>
     _dotController.reverse();
   }
 
-  String? _currentButtonId; // 当前激活弹窗的按钮ID
-
-  void toggleControl(TapDownDetails details, String buttonId) {
-    setState(() {
-      final newDx = (details.globalPosition.dx * 2).w;
-      final newDy = (details.globalPosition.dy * 2).h;
-
-      // 如果当前是同一个按钮，则直接关闭弹窗
-      if (showControl && _currentButtonId == buttonId) {
-        showControl = false;
-        _dotController.reverse(); // 收起动画
-        return;
-      }
-
-      // 更新状态和位置
-      dx = newDx;
-      dy = newDy;
-      _currentButtonId = buttonId;
-      showControl = true;
-      _dotController.forward(); // 展开动画
-    });
-  }
-
   /// 提取 double 类型的小数点左边和右边的部分
   Map<String, dynamic> extractParts(double value) {
     // 转换为字符串，方便分割
@@ -235,6 +212,121 @@ class _PublishPageState extends State<PublishPage>
     } else {
       return kGrey; // 默认颜色
     }
+  }
+
+  void deletePublished({required String itemId}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: false,
+      barrierColor: Colors.black.withOpacity(0.2),
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          width: 1.sw,
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+          ),
+          margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 100.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                ),
+                width: 1.sw,
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30.r),
+                        topRight: Radius.circular(30.r),
+                      ),
+                      child: CupButton(
+                        pressedColor: Color(0xFFdbdbdd),
+                        onPressed: () {},
+                        child: Container(
+                          width: 1.sw,
+                          padding: EdgeInsets.symmetric(vertical: 30.w),
+                          child: Center(
+                            child: Text(
+                              '将删除此发布物品。',
+                              style: TextStyle(
+                                fontSize: 35.sp,
+                                color: kGrey,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 1.sw,
+                      color: kDevideColor,
+                      height: 2.w,
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(30.r),
+                        bottomRight: Radius.circular(30.r),
+                      ),
+                      child: CupButton(
+                        pressedColor: Color(0xFFdbdbdd),
+                        onPressed: () async {
+                          Get.back();
+                          await publishController.deleteItem(itemId: itemId);
+                          setState(() {});
+                        },
+                        child: Container(
+                          width: 1.sw,
+                          padding: EdgeInsets.symmetric(vertical: 30.w),
+                          child: Center(
+                            child: Text(
+                              '确认删除',
+                              style: TextStyle(
+                                fontSize: 55.sp,
+                                fontWeight: FontWeight.bold,
+                                color: kBlue,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20.w),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(30.r),
+                      child: CupButton(
+                        pressedColor: Color(0xFFdbdbdd),
+                        onPressed: () {
+                          Get.back();
+                        },
+                        child: Container(
+                          width: 1.sw,
+                          padding: EdgeInsets.symmetric(vertical: 30.w),
+                          child: Center(
+                            child: Text(
+                              '取消',
+                              style: TextStyle(
+                                fontSize: 55.sp,
+                                fontWeight: FontWeight.bold,
+                                color: kBlue,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -550,9 +642,8 @@ class _PublishPageState extends State<PublishPage>
                                                     size: 60.w,
                                                   ),
                                                   onPressed: () {
-                                                    publishController.deleteItem(
-                                                        itemId:
-                                                            _currentButtonId!);
+                                                    deletePublished(
+                                                        itemId: item.id);
                                                   })
                                             ],
                                           ),
@@ -822,8 +913,8 @@ class _PublishPageState extends State<PublishPage>
                                                                     details) {
                                                               publishController
                                                                   .deleteItem(
-                                                                      itemId:
-                                                                          _currentButtonId!);
+                                                                      itemId: item
+                                                                          .id);
                                                             },
                                                             child: Icon(
                                                               CupertinoIcons
